@@ -104,8 +104,8 @@ def creer_table_joueur():
             prenom VARCHAR(100) NOT NULL,
             categorie  ENUM('Junior', 'Senior') ,
             selection_nationale VARCHAR(50),
-            poste_principal ENUM('Gardien', 'Défenseur', 'Milieu', 'Attaquant', 'Latéral', 'Pivot') NOT NULL,
-            
+            poste_principal ENUM('Gardien', 'Défenseur', 'Milieu', 'Attaquant', 'Latéral', 'Pivot') NOT NULL DEFAULT 'Milieu',
+                    
             pied_fort ENUM('Droit', 'Gauche', 'Ambidextre'),
             taille INT,
             poids DECIMAL(5,2),
@@ -572,7 +572,7 @@ def creer_table_suivi_psychologique():
 def creer_table_test_physique():
     pass
 
-def creer_table_evaluation_sur_periode():
+def creer_table_evaluation_sur_periode(): 
     try:
         db =create_connection()
         
@@ -675,29 +675,289 @@ def creer_table_evaluation_sur_match():
 
 
 
-# creer_table_joueur()
-# creer_table_match()
-# creer_table_evaluation_technique()
-# creer_table_evaluation_tactique()
-# creer_table_evaluation_comportementale()
-# creer_table_test_athletique()
-# creer_table_test_morphologique()
-# creer_table_test_medical()
-# creer_table_suivi_nutritionnel()
-# creer_table_evaluation_sur_periode()
-# creer_table_evaluation_sur_match()
-
-# Insert a player
-# inserer_joueur("Dupont", "Jean", "Senior", "France", "Milieu", "Droit", 180, 75.5, "1990-05-15")
-
-# # Insert a match
-# inserer_match("2025-04-01 15:00:00", "Stade de France", "EST", "Championnat", True, 3, 1, "2024/2025")
 
 
-# joueurs = selectionner_tous_les_joueurs()
-# for joueur in joueurs:
-#     print(joueur)
 
-# # Select a specific player by ID
-# joueur = selectionner_joueur_par_id(1)
-# print(joueur)
+
+
+# test de l'insertion
+def inserer_15_joueurs():
+    try:
+        db = create_connection()
+        cursor = db.cursor()
+
+        joueurs = [
+            ("Dupont", "Jean", "Senior", "France", "Milieu", "Droit", 180, 75.5, "1990-05-15", 50, 40, 10, 3600, 15, 10, 2, 0, False, None, None, None, None, None),
+            ("Martin", "Paul", "Junior", "France", "Défenseur", "Gauche", 185, 80.0, "2002-03-10", 30, 25, 5, 2700, 5, 3, 1, 0, False, None, None, None, None, None),
+            ("Durand", "Luc", "Senior", "France", "Attaquant", "Droit", 175, 70.0, "1995-07-20", 60, 50, 10, 4000, 25, 12, 3, 1, False, None, None, None, None, None),
+            ("Petit", "Marie", "Junior", "France", "Gardien", "Ambidextre", 190, 85.0, "2004-11-05", 20, 18, 2, 1800, 0, 0, 0, 0, False, None, None, None, None, None),
+            ("Bernard", "Sophie", "Senior", "France", "Latéral", "Gauche", 165, 60.0, "1992-02-25", 40, 35, 5, 3200, 8, 6, 2, 0, False, None, None, None, None, None),
+            ("Morel", "Julien", "Junior", "France", "Pivot", "Droit", 195, 90.0, "2003-06-15", 25, 20, 5, 2000, 10, 8, 1, 0, False, None, None, None, None, None),
+            ("Simon", "Claire", "Senior", "France", "Milieu", "Gauche", 170, 65.0, "1991-09-30", 55, 45, 10, 3500, 12, 9, 3, 1, False, None, None, None, None, None),
+            ("Lemoine", "Hugo", "Junior", "France", "Défenseur", "Droit", 180, 75.0, "2005-01-12", 15, 12, 3, 1200, 3, 2, 0, 0, False, None, None, None, None, None),
+            ("Roux", "Emma", "Senior", "France", "Attaquant", "Ambidextre", 175, 68.0, "1993-04-18", 65, 55, 10, 4200, 30, 15, 4, 1, False, None, None, None, None, None),
+            ("Blanc", "Lucas", "Junior", "France", "Gardien", "Droit", 185, 82.0, "2001-08-22", 18, 15, 3, 1500, 0, 0, 0, 0, False, None, None, None, None, None),
+            ("Fontaine", "Alice", "Senior", "France", "Latéral", "Gauche", 160, 55.0, "1994-12-10", 45, 40, 5, 3000, 6, 4, 1, 0, False, None, None, None, None, None),
+            ("Chevalier", "Thomas", "Junior", "France", "Pivot", "Droit", 200, 95.0, "2006-03-05", 10, 8, 2, 800, 5, 3, 0, 0, False, None, None, None, None, None),
+            ("Garnier", "Julie", "Senior", "France", "Milieu", "Gauche", 175, 62.0, "1997-05-25", 50, 45, 5, 3600, 18, 12, 2, 0, False, None, None, None, None, None),
+            ("Lambert", "Antoine", "Junior", "France", "Défenseur", "Droit", 180, 78.0, "2000-10-10", 35, 30, 5, 2500, 7, 5, 1, 0, False, None, None, None, None, None),
+            ("Girard", "Camille", "Senior", "France", "Attaquant", "Ambidextre", 170, 63.0, "1996-07-07", 70, 60, 10, 4500, 35, 20, 5, 2, False, None, None, None, None, None)
+        ]
+
+        query = """
+        INSERT INTO joueur (nom, prenom, categorie, selection_nationale, poste_principal, pied_fort, taille, poids, date_naissance,
+        matchs_joues, titulaire, remplacant, tempsjeu, buts, assists, carton_jaune, carton_rouge, est_blesse, type_blessure,
+        date_blessure, date_retour_prevue, severite_blessure, description_blessure)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+        """
+
+        cursor.executemany(query, joueurs)
+        db.commit()
+        print("15 joueurs insérés avec succès!")
+    except pymysql.Error as err:
+        print(f"Erreur lors de l'insertion des joueurs: {err}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+            
+def inserer_sur_periodes_evaluations_pour_joueurs():
+    try:
+        db = create_connection()
+        cursor = db.cursor()
+
+        # Fetch all player IDs
+        cursor.execute("SELECT id FROM joueur")
+        joueurs = cursor.fetchall()
+
+        # Define periods
+        periodes = ["Période 1", "Période 2", "Période 3", "Période 4", "Période 5"]
+
+        for joueur in joueurs:
+            joueur_id = joueur[0]
+
+            for i, periode in enumerate(periodes):
+                # Generate a unique evaluation date for each period
+                evaluation_date = f"2025-04-{4 + i}"  # Example: 2025-04-04, 2025-04-05, etc.
+
+                # Insert technical evaluation
+                query_technique = """
+                INSERT INTO evaluation_technique (id_joueur, evaluation_date, qualite_premiere_touche, qualite_passes, technique_defensive, sens_tactique_vision, vitesse_pensee, anticipation, adaptation_adversaire, sens_replacement, sens_demarquage, sens_marquage, technique_generale, jeu_tete, puissance_frappe, drible_feinte, technique_au_poste, puissance_physique, rapidite, moyenne_technique)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(query_technique, (joueur_id, evaluation_date, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 3.5))
+                id_technique = cursor.lastrowid
+
+                # Insert tactical evaluation
+                query_tactique = """
+                INSERT INTO evaluation_tactique (id_joueur, evaluation_date, disponibilite, intelligence_de_jeu, jouer_vers_avant, jouer_dos_adversaires, changer_rythme, moyenne_tactique)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(query_tactique, (joueur_id, evaluation_date, 4, 3, 4, 3, 4, 3.6))
+                id_tactique = cursor.lastrowid
+
+                # Insert behavioral evaluation
+                query_comportementale = """
+                INSERT INTO evaluation_comportementale (id_joueur, evaluation_date, assiduite, motivation_volonte, confiance_prise_risque, calme_maitrise_soi, combativite, sportivite, amabilite, moyenne_comportementale)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(query_comportementale, (joueur_id, evaluation_date, 4, 4, 3, 4, 3, 4, 3, 3.6))
+                id_comportementale = cursor.lastrowid
+
+                # Insert athletic test
+                query_athletique = """
+                INSERT INTO test_athletique (id_joueur, categorie, date_test, periode_test, detente_horizontale, detente_verticale, vitesse_thalf_test, vitesse_10m, vitesse_20m, vitesse_30m, aerobie_vameval_vo2max, vma_kmh, vma_ms, yoyo_pal)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(query_athletique, (joueur_id, "Juniors", evaluation_date, periode, 2.5, 50, 12.5, 1.8, 3.5, 5.0, 60.0, 15.0, 4.2, 15))
+
+                # Insert morphological test
+                query_morphologique = """
+                INSERT INTO test_morphologique (id_joueur, date_test, periode_test, poids, taille, masse_grasse)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(query_morphologique, (joueur_id, evaluation_date, periode, 75.5, 180, 15.0))
+
+                # Insert medical test
+                query_medical = """
+                INSERT INTO test_medical (id_joueur, categorie, date_test, periode_test, taille, poids, masse_grasse, examen_general, examen_orthopedique, examen_dentaire, examen_orl, examen_dermatologique, examen_psychologique, commentaires)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(query_medical, (joueur_id, "Juniors", evaluation_date, periode, 180, 75.5, 15.0, 4, 4, 3, 4, 3, 4, "RAS"))
+
+                # Insert nutritional follow-up
+                query_nutritionnel = """
+                INSERT INTO suivi_nutritionnel (id_joueur, groupe, date_creation, periode_test, age, poids_depart, taille, objectif, details_objectif, regime_specifique, poids_actuel, satisfaction, commentaires)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(query_nutritionnel, (joueur_id, "Groupe 1", evaluation_date, periode, 25, 75.5, 1.80, "Maintien", "Maintenir le poids", "Régime équilibré", 75.5, 5, "RAS"))
+
+                # Insert evaluation for the period
+                query_evaluation_periode = """
+                INSERT INTO evaluation_sur_periode (id_joueur, periode_test, evaluation_date, id_evaluation_technique, id_evaluation_tactique, id_evaluation_comportementale, moyenne_generale)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """
+                moyenne_generale = (3.5 + 3.6 + 3.6) / 3
+                cursor.execute(query_evaluation_periode, (joueur_id, periode, evaluation_date, id_technique, id_tactique, id_comportementale, moyenne_generale))
+
+        db.commit()
+        print("Évaluations insérées avec succès pour tous les joueurs!")
+    except pymysql.Error as err:
+        print(f"Erreur lors de l'insertion des évaluations: {err}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+            
+def inserer_evaluations_par_match_pour_joueurs():
+    try:
+        db = create_connection()
+        cursor = db.cursor()
+
+        # Fetch all player IDs
+        cursor.execute("SELECT id FROM joueur")
+        joueurs = cursor.fetchall()
+
+        # Fetch all match IDs
+        cursor.execute("SELECT id FROM matchs")
+        matchs = cursor.fetchall()
+
+        for joueur in joueurs:
+            joueur_id = joueur[0]
+
+            for i, match in enumerate(matchs[:10]):  # Limit to 10 matches per player
+                match_id = match[0]
+
+                # Generate a unique evaluation date for each match
+                evaluation_date = f"2025-05-{4 + i}"  # Example: 2025-04-04, 2025-04-05, etc.
+
+                # Insert technical evaluation
+                query_technique = """
+                INSERT INTO evaluation_technique (id_joueur, evaluation_date, qualite_premiere_touche, qualite_passes, technique_defensive, sens_tactique_vision, vitesse_pensee, anticipation, adaptation_adversaire, sens_replacement, sens_demarquage, sens_marquage, technique_generale, jeu_tete, puissance_frappe, drible_feinte, technique_au_poste, puissance_physique, rapidite, moyenne_technique)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(query_technique, (joueur_id, evaluation_date, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 3.5))
+                id_technique = cursor.lastrowid
+
+                # Insert tactical evaluation
+                query_tactique = """
+                INSERT INTO evaluation_tactique (id_joueur, evaluation_date, disponibilite, intelligence_de_jeu, jouer_vers_avant, jouer_dos_adversaires, changer_rythme, moyenne_tactique)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(query_tactique, (joueur_id, evaluation_date, 4, 3, 4, 3, 4, 3.6))
+                id_tactique = cursor.lastrowid
+
+                # Insert behavioral evaluation
+                query_comportementale = """
+                INSERT INTO evaluation_comportementale (id_joueur, evaluation_date, assiduite, motivation_volonte, confiance_prise_risque, calme_maitrise_soi, combativite, sportivite, amabilite, moyenne_comportementale)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(query_comportementale, (joueur_id, evaluation_date, 4, 4, 3, 4, 3, 4, 3, 3.6))
+                id_comportementale = cursor.lastrowid
+
+                # Insert evaluation for the match
+                query_evaluation_match = """
+                INSERT INTO evaluation_sur_match (id_joueur, id_match, id_evaluation_technique, id_evaluation_tactique, id_evaluation_comportementale, moyenne_generale)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """
+                moyenne_generale = (3.5 + 3.6 + 3.6) / 3
+                cursor.execute(query_evaluation_match, (joueur_id, match_id, id_technique, id_tactique, id_comportementale, moyenne_generale))
+
+        db.commit()
+        print("Évaluations par match insérées avec succès pour tous les joueurs!")
+    except pymysql.Error as err:
+        print(f"Erreur lors de l'insertion des évaluations par match: {err}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+
+def inserer_evaluation_sur_periode_pour_joueur_7():
+    try:
+        db = create_connection()
+        cursor = db.cursor()
+
+        joueur_id = 7
+        periode = "Période 1"
+        evaluation_date = "2025-06-04"
+
+        # Insert technical evaluation
+        query_technique = """
+        INSERT INTO evaluation_technique (id_joueur, evaluation_date, qualite_premiere_touche, qualite_passes, technique_defensive, sens_tactique_vision, vitesse_pensee, anticipation, adaptation_adversaire, sens_replacement, sens_demarquage, sens_marquage, technique_generale, jeu_tete, puissance_frappe, drible_feinte, technique_au_poste, puissance_physique, rapidite, moyenne_technique)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query_technique, (joueur_id, evaluation_date, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 3.5))
+        id_technique = cursor.lastrowid
+
+        # Insert tactical evaluation
+        query_tactique = """
+        INSERT INTO evaluation_tactique (id_joueur, evaluation_date, disponibilite, intelligence_de_jeu, jouer_vers_avant, jouer_dos_adversaires, changer_rythme, moyenne_tactique)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query_tactique, (joueur_id, evaluation_date, 4, 3, 4, 3, 4, 3.6))
+        id_tactique = cursor.lastrowid
+
+        # Insert behavioral evaluation
+        query_comportementale = """
+        INSERT INTO evaluation_comportementale (id_joueur, evaluation_date, assiduite, motivation_volonte, confiance_prise_risque, calme_maitrise_soi, combativite, sportivite, amabilite, moyenne_comportementale)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query_comportementale, (joueur_id, evaluation_date, 4, 4, 3, 4, 3, 4, 3, 3.6))
+        id_comportementale = cursor.lastrowid
+
+        # Insert athletic test
+        query_athletique = """
+        INSERT INTO test_athletique (id_joueur, categorie, date_test, periode_test, detente_horizontale, detente_verticale, vitesse_thalf_test, vitesse_10m, vitesse_20m, vitesse_30m, aerobie_vameval_vo2max, vma_kmh, vma_ms, yoyo_pal)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query_athletique, (joueur_id, "Juniors", evaluation_date, periode, 2.5, 50, 12.5, 1.8, 3.5, 5.0, 60.0, 15.0, 4.2, 15))
+        id_athletique = cursor.lastrowid
+
+        # Insert morphological test
+        query_morphologique = """
+        INSERT INTO test_morphologique (id_joueur, date_test, periode_test, poids, taille, masse_grasse)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query_morphologique, (joueur_id, evaluation_date, periode, 75.5, 180, 15.0))
+        id_morphologique = cursor.lastrowid
+
+        # Insert medical test
+        query_medical = """
+        INSERT INTO test_medical (id_joueur, categorie, date_test, periode_test, taille, poids, masse_grasse, examen_general, examen_orthopedique, examen_dentaire, examen_orl, examen_dermatologique, examen_psychologique, commentaires)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query_medical, (joueur_id, "Juniors", evaluation_date, periode, 180, 75.5, 15.0, 4, 4, 3, 4, 3, 4, "RAS"))
+        id_medical = cursor.lastrowid
+
+        # Insert nutritional follow-up
+        query_nutritionnel = """
+        INSERT INTO suivi_nutritionnel (id_joueur, groupe, date_creation, periode_test, age, poids_depart, taille, objectif, details_objectif, regime_specifique, poids_actuel, satisfaction, commentaires)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query_nutritionnel, (joueur_id, "Groupe 1", evaluation_date, periode, 25, 75.5, 1.80, "Maintien", "Maintenir le poids", "Régime équilibré", 75.5, 5, "RAS"))
+        id_nutritionnel = cursor.lastrowid
+
+        # Insert evaluation for the period
+        query_evaluation_periode = """
+        INSERT INTO evaluation_sur_periode (id_joueur, periode_test, evaluation_date, id_evaluation_technique, id_evaluation_tactique, id_evaluation_comportementale, id_test_athletique, id_test_morphologique, id_test_medical, id_suivi_nutritionnel, moyenne_generale)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        moyenne_generale = (3.5 + 3.6 + 3.6) / 3
+        cursor.execute(query_evaluation_periode, (joueur_id, periode, evaluation_date, id_technique, id_tactique, id_comportementale, id_athletique, id_morphologique, id_medical, id_nutritionnel, moyenne_generale))
+
+        db.commit()
+        print("Évaluation sur période insérée avec succès pour le joueur d'ID 7!")
+    except pymysql.Error as err:
+        print(f"Erreur lors de l'insertion de l'évaluation sur période: {err}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+
+# inserer_15_joueurs()
+
+# inserer_sur_periodes_evaluations_pour_joueurs()
+
+# inserer_evaluations_par_match_pour_joueurs()
+
+# inserer_evaluation_sur_periode_pour_joueur_7()
