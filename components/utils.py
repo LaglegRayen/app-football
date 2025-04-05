@@ -34,7 +34,7 @@ def joueur_non_existant():
        """Joueur n'existe pas"""
        pass
    
-   
+
 
 
 def clean_string(input_string):

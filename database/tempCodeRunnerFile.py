@@ -1,3 +1,11 @@
-specific player by ID
-joueur = selectionner_joueur_par_id(1)
-print(joueur)
+()
+creer_table_match()
+create_table_evaluation_technique()
+creer_table_evaluation_tactique()
+creer_table_evaluation_comportementale()
+creer_table_test_athletique()
+creer_table_test_morphologique()
+creer_table_test_medical()
+creer_table_suivi_nutritionnel()
+creer_table_evaluation_sur_periode()
+creer_table_evaluation_sur_ma

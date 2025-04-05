@@ -1,17 +1,101 @@
-from queries import *
 import pymysql
 
 
-        
 
-def creer_table_joueur():
+def create_connection():
+    """Create a database connection to the MySQL database."""
+    connection = None
     try:
-        db = pymysql.connect(
+        connection = pymysql.connect(
             host="localhost",       # or your host name/IP address
             user="root",          # your MySQL username
             password="LAGLEG123",
             database="my_database"  # optional if you want to connect to specific db
         )
+        if connection in locals():
+            print("Connection to the database was successful.")
+    except pymysql.Error as e:
+        print(f"The error '{e}' occurred")
+    return connection
+# def creer_fonction_moyenne_generale_sur_periode():
+#     try:
+#         db = pymysql.connect(
+#             host="localhost",       # or your host name/IP address
+#             user="root",          # your MySQL username
+#             password="LAGLEG123",
+#             database="my_database"  # optional if you want to connect to specific db
+#         )
+#         cursor = db.cursor()
+#         query = """
+#         CREATE FUNCTION moyenne_generale_sur_periode(id_evaluation_technique INT,
+#                 id_evaluation_tactique INT, id_evaluation_comportementale INT)
+#         RETURNS FLOAT
+#         DETERMINISTIC
+#         READS SQL DATA
+        
+#         BEGIN
+        
+#             RETURN (
+#         (SELECT moyenne_technique FROM evaluation_technique WHERE id = id_evaluation_technique) +
+#         (SELECT moyenne_tactique FROM evaluation_tactique WHERE id = id_evaluation_tactique) +
+#         (SELECT moyenne_comportementale FROM evaluation_comportementale WHERE id = id_evaluation_comportementale)
+#     ) / 3;
+#         END;
+#         """
+#         cursor.execute(query)
+#         db.commit()
+#         print("Fonction créée avec succès!")
+#     except pymysql.Error as e:
+#         print(f"Erreur lors de la création de la fonction: {e}")
+#     finally:
+#         if 'db' in locals():
+#             cursor.close()
+#             db.close()
+# def creer_fonction_moyenne_match():
+#     try:
+#         db = pymysql.connect(
+#             host="localhost",       # or your host name/IP address
+#             user="root",          # your MySQL username
+#             password="LAGLEG123",
+#             database="my_database"  # optional if you want to connect to specific db
+#         )
+#         cursor = db.cursor()
+#         query = """
+#         CREATE FUNCTION moyenne_match(id_evaluation_technique INT,
+#                 id_evaluation_tactique INT, id_evaluation_comportementale INT)
+#         RETURNS FLOAT
+#         DECLARE 
+#             moyenne_technique FLOAT;
+#             moyenne_tactique FLOAT;
+#             moyenne_comportementale FLOAT;
+#             moyenne_generale FLOAT;
+        
+#         BEGIN
+        
+#             SELECT evaluation_technique.moyenne_technique INTO moyenne_technique FROM evaluation_technique WHERE id_evaluation_technique = evaluation_technique.id_evaluation_technique;
+            
+#             SELECT evaluation_tactique.moyenne_tactique INTO moyenne_tactique FROM evaluation_tactique WHERE id_evaluation_tactique = evaluation_tactique.id_evaluation_tactique;
+            
+#             SELECT evaluation_comportementale.moyenne_comportementale INTO moyenne_comportementale FROM evaluation_comportementale WHERE id_evaluation_comportementale = evaluation_comportementale.id_evaluation_comportementale;
+            
+#             SET moyenne_generale = (moyenne_technique + moyenne_tactique + moyenne_comportementale) / 3;
+            
+#             RETURN moyenne;
+#         END;
+#         """
+#         cursor.execute(query)
+#         db.commit()
+#         print("Fonction créée avec succès!")
+#     except pymysql.Error as e:
+#         print(f"Erreur lors de la création de la fonction: {e}")
+#     finally:
+#         if 'db' in locals():
+#             cursor.close()
+#             db.close()
+
+def creer_table_joueur():
+    try:
+        db =create_connection()
         cursor = db.cursor()
         req_creation = """
         CREATE TABLE IF NOT EXISTS joueur (
@@ -79,12 +163,7 @@ def creer_table_joueur():
                   
 def creer_table_match():
     try:
-        db = pymysql.connect(
-            host="localhost",       # or your host name/IP address
-            user="root",          # your MySQL username
-            password="LAGLEG123",
-            database="my_database"  # optional if you want to connect to specific db
-        )
+        db =create_connection()
         
         cursor = db.cursor()
         
@@ -135,14 +214,9 @@ def creer_table_match():
             cursor.close()
             db.close()
 
-def create_table_evaluation_technique(): 
+def creer_table_evaluation_technique(): 
     try:
-        db = pymysql.connect(
-            host="localhost",       # or your host name/IP address
-            user="root",          # your MySQL username
-            password="LAGLEG123",
-            database="my_database"  # optional if you want to connect to specific db
-        )
+        db =create_connection()
         
         cursor = db.cursor()
         
@@ -153,29 +227,29 @@ def create_table_evaluation_technique():
             id_joueur INT NOT NULL,
             evaluation_date DATE NOT NULL,
             
-            qualite_premiere_touche TINYINT CHECK (premiere_touche_intention BETWEEN 0 AND 5),
-            qualite_passes TINYINT CHECK (qualite_passes BETWEEN 0 AND 5),
-            technique_defensive TINYINT CHECK (technique_defensive BETWEEN 0 AND 5),
-            sens_tactique_vision TINYINT CHECK (sens_tactique_vision BETWEEN 0 AND 5),
-            vitesse_pensee TINYINT CHECK (vitesse_pensee BETWEEN 0 AND 5),
-            anticipation TINYINT CHECK (anticipation BETWEEN 0 AND 5),
-            adaptation_adversaire TINYINT CHECK (adaptation_adversaire BETWEEN 0 AND 5),
-            sens_replacement TINYINT CHECK (sens_replacement BETWEEN 0 AND 5),
-            sens_demarquage TINYINT CHECK (sens_demarquage BETWEEN 0 AND 5),
-            sens_marquage TINYINT CHECK (sens_marquage BETWEEN 0 AND 5),
-            technique_generale TINYINT CHECK (technique_generale BETWEEN 0 AND 5),
-            jeu_tete TINYINT CHECK (jeu_tete BETWEEN 0 AND 5),
-            puissance_frappe TINYINT CHECK (puissance_frappe BETWEEN 0 AND 5),
-            drible_feinte TINYINT CHECK (drible_feinte BETWEEN 0 AND 5),
-            technique_au_poste TINYINT CHECK (technique_au_poste BETWEEN 0 AND 5),
-            puissance_physique TINYINT CHECK (puissance_physique BETWEEN 0 AND 5),
-            rapidite TINYINT CHECK (rapidite BETWEEN 0 AND 5),
+            qualite_premiere_touche TINYINT,
+            qualite_passes TINYINT ,
+            technique_defensive TINYINT,
+            sens_tactique_vision TINYINT,
+            vitesse_pensee TINYINT,
+            anticipation TINYINT,
+            adaptation_adversaire TINYINT,
+            sens_replacement TINYINT,
+            sens_demarquage TINYINT,
+            sens_marquage TINYINT,
+            technique_generale TINYINT,
+            jeu_tete TINYINT,
+            puissance_frappe TINYINT,
+            drible_feinte TINYINT,
+            technique_au_poste TINYINT,
+            puissance_physique TINYINT,
+            rapidite TINYINT,
 
             
             moyenne_technique DECIMAL(3,2),
             
-            FOREIGN KEY (player_id) REFERENCES players(id),
-            INDEX idx_player (player_id),
+            FOREIGN KEY (id_joueur) REFERENCES joueur(id),
+            INDEX idx_player (id_joueur),
             INDEX idx_date (evaluation_date),
             UNIQUE KEY uk_joueur_date (id_joueur, evaluation_date)
         );
@@ -194,12 +268,7 @@ def create_table_evaluation_technique():
 
 def creer_table_evaluation_tactique():
     try:
-        db = pymysql.connect(
-            host="localhost",       # or your host name/IP address
-            user="root",          # your MySQL username
-            password="LAGLEG123",
-            database="my_database"  # optional if you want to connect to specific db
-        )
+        db =create_connection()
         
         
         cursor = db.cursor()
@@ -209,16 +278,16 @@ def creer_table_evaluation_tactique():
             id_joueur INT NOT NULL,
             evaluation_date DATE NOT NULL,
             
-            intelligence_de_jeu TINYINT CHECK (intelligence_de_jeu BETWEEN 0 AND 5),
-            disponibilite TINYINT CHECK (disponibilite BETWEEN 0 AND 5),
-            jouer_vers_avant TINYINT CHECK (jouer_vers_avant BETWEEN 0 AND 5),
-            jouer_dos_adversaires TINYINT CHECK (jouer_dos_adversaires BETWEEN 0 AND 5),
-            changer_rythme TINYINT CHECK (changer_rythme BETWEEN 0 AND 5),
+            disponibilite TINYINT,
+            intelligence_de_jeu TINYINT,
+            jouer_vers_avant TINYINT,
+            jouer_dos_adversaires TINYINT,
+            changer_rythme TINYINT, 
             
             
             moyenne_tactique DECIMAL(3,2),
             
-            FOREIGN KEY (id_jouer) REFERENCES joueur(id),
+            FOREIGN KEY (id_joueur) REFERENCES joueur(id),
             INDEX idx_player (id_joueur),
             INDEX idx_date (evaluation_date),
             UNIQUE KEY uk_joueur_date (id_joueur, evaluation_date)
@@ -236,12 +305,7 @@ def creer_table_evaluation_tactique():
 
 def creer_table_evaluation_comportementale():
     try:
-        db = pymysql.connect(
-            host="localhost",       # or your host name/IP address
-            user="root",          # your MySQL username
-            password="LAGLEG123",
-            database="my_database"  # optional if you want to connect to specific db
-        )
+        db =create_connection()
         
         
         cursor = db.cursor()
@@ -252,18 +316,18 @@ def creer_table_evaluation_comportementale():
             evaluation_date DATE NOT NULL,
             
             -- Tableau principal
-            assiduite TINYINT CHECK (assiduite BETWEEN 0 AND 5),
-            motivation_volonte TINYINT CHECK (motivation_volonte BETWEEN 0 AND 5),
-            confiance_prise_risque TINYINT CHECK (confiance_prise_risque BETWEEN 0 AND 5),
-            calme_maitrise_soi TINYINT CHECK (calme_maitrise_soi BETWEEN 0 AND 5),
-            combativite TINYINT CHECK (combativite BETWEEN 0 AND 5),
-            sportivite TINYINT CHECK (sportivite BETWEEN 0 AND 5),
-            amabilite TINYINT CHECK (amabilite BETWEEN 0 AND 5),
+            assiduite TINYINT,
+            motivation_volonte TINYINT,
+            confiance_prise_risque TINYINT,
+            calme_maitrise_soi TINYINT,
+            combativite TINYINT,
+            sportivite TINYINT ,
+            amabilite TINYINT,
             
             moyenne_comportementale DECIMAL(3,2),
             
             FOREIGN KEY (id_joueur) REFERENCES joueur(id),
-            INDEX idx_player (player_id),
+            INDEX idx_player (id_joueur),
             INDEX idx_date (evaluation_date),
             UNIQUE KEY uk_joueur_date (id_joueur, evaluation_date)
             
@@ -281,12 +345,7 @@ def creer_table_evaluation_comportementale():
 
 def creer_table_test_athletique():  
     try:
-        db = pymysql.connect(
-            host="localhost",       # or your host name/IP address
-            user="root",          # your MySQL username
-            password="LAGLEG123",
-            database="my_database"  # optional if you want to connect to specific db
-        )
+        db =create_connection()
         
         cursor = db.cursor()
         
@@ -294,9 +353,9 @@ def creer_table_test_athletique():
         CREATE TABLE IF NOT EXISTS test_athletique (
             id INT AUTO_INCREMENT PRIMARY KEY,
             id_joueur INT NOT NULL,
-            categorie VARCHAR(50) DEFAULT ENUM(),
+            categorie ENUM('Minimes A','Minimes B', 'Juniors', 'Cadets A', 'Cadets B', 'Seniors A', 'Seniors B') NOT NULL DEFAULT 'Juniors',
             date_test DATE NOT NULL,
-            periode_test ENUM('Période 1', 'Période 2', 'Période 3', 'Période 4', 'Période 5') NOT NULL,
+            periode_test ENUM('Période 1', 'Période 2', 'Période 3', 'Période 4', 'Période 5') NOT NULL DEFAULT 'Période 1',
             
             -- Détente Horizontale
             detente_horizontale DECIMAL(5,2) COMMENT 'en mètres',
@@ -317,7 +376,7 @@ def creer_table_test_athletique():
             yoyo_pal INT COMMENT 'Palier YOYO atteint',
             
             
-            FOREIGN KEY (id_joueur) REFERENCES joueurs(id),
+            FOREIGN KEY (id_joueur) REFERENCES joueur(id),
             INDEX idx_joueur (id_joueur),
             INDEX idx_date (date_test),
             INDEX idx_periode (periode_test),
@@ -338,12 +397,7 @@ def creer_table_test_athletique():
 
 def creer_table_test_morphologique():
     try:
-        db = pymysql.connect(
-            host="localhost",       # or your host name/IP address
-            user="root",          # your MySQL username
-            password="LAGLEG123",
-            database="my_database"  # optional if you want to connect to specific db
-        )
+        db =create_connection()
         
         cursor = db.cursor()
         
@@ -352,7 +406,7 @@ def creer_table_test_morphologique():
             id INT AUTO_INCREMENT PRIMARY KEY,
             id_joueur INT NOT NULL,
             date_test DATE NOT NULL,
-            periode_test ENUM('Période 1', 'Période 2', 'Période 3', 'Période 4', 'Période 5') NOT NULL,
+            periode_test ENUM('Période 1', 'Période 2', 'Période 3', 'Période 4', 'Période 5') NOT NULL DEFAULT 'Période 1',
             
             
             -- Mesures de base
@@ -374,7 +428,7 @@ def creer_table_test_morphologique():
             ) STORED,
             
             
-            FOREIGN KEY (id_joueur) REFERENCES joueurs(id),
+            FOREIGN KEY (id_joueur) REFERENCES joueur(id),
             INDEX idx_joueur (id_joueur),
             INDEX idx_date (date_test),
             INDEX idx_periode (periode_test),
@@ -395,12 +449,7 @@ def creer_table_test_morphologique():
 
 def creer_table_test_medical():
     try:
-        db = pymysql.connect(
-            host="localhost",       # or your host name/IP address
-            user="root",          # your MySQL username
-            password="LAGLEG123",
-            database="my_database"  # optional if you want to connect to specific db
-        )
+        db =create_connection()
         
         cursor = db.cursor()
         
@@ -408,9 +457,10 @@ def creer_table_test_medical():
         CREATE TABLE IF NOT EXISTS test_medical (
             id INT AUTO_INCREMENT PRIMARY KEY,
             id_joueur INT NOT NULL,
-            categorie ENUM() NOT NULL,
+            categorie ENUM('Minimes A','Minimes B', 'Juniors', 'Cadets A', 'Cadets B', 'Seniors A', 'Seniors B') NOT NULL DEFAULT 'Juniors',
+            
             date_test DATE NOT NULL,
-            periode_test ENUM('Période 1', 'Période 2', 'Période 3', 'Période 4', 'Période 5') NOT NULL,
+            periode_test ENUM('Période 1', 'Période 2', 'Période 3', 'Période 4', 'Période 5') NOT NULL DEFAULT 'Période 1',
             
             
             -- Examen Morphologique
@@ -419,12 +469,12 @@ def creer_table_test_medical():
             masse_grasse DECIMAL(5,2) COMMENT 'Masse grasse en %',
             
             -- Examens médicaux
-            examen_general TINYINT CHECK (examen_general BETWEEN 0 AND 5),
-            examen_orthopedique TINYINT CHECK (examen_orthopedique BETWEEN 0 AND 5),
-            examen_dentaire TINYINT CHECK (examen_dentaire BETWEEN 0 AND 5),
-            examen_orl TINYINT CHECK (examen_orl BETWEEN 0 AND 5),
-            examen_dermatologique TINYINT CHECK (examen_dermatologique BETWEEN 0 AND 5),
-            examen_psychologique TINYINT CHECK (examen_psychologique BETWEEN 0 AND 5),
+            examen_general TINYINT,
+            examen_orthopedique TINYINT,
+            examen_dentaire TINYINT,
+            examen_orl TINYINT,
+            examen_dermatologique TINYINT,
+            examen_psychologique TINYINT,
             
             
             -- Commentaires généraux
@@ -436,7 +486,7 @@ def creer_table_test_medical():
             INDEX idx_periode (periode_test),
             INDEX idx_categorie (categorie),
             UNIQUE KEY uk_joueur_date (id_joueur, date_test),
-            UNIQUE KEY uk_joueur_date (id_joueur, periode_test),
+            UNIQUE KEY uk_joueur_periode (id_joueur, periode_test)
         );
         """
         
@@ -452,12 +502,7 @@ def creer_table_test_medical():
 
 def creer_table_suivi_nutritionnel():
     try:
-        db = pymysql.connect(
-            host="localhost",       # or your host name/IP address
-            user="root",          # your MySQL username
-            password="LAGLEG123",
-            database="my_database"  # optional if you want to connect to specific db
-        )
+        db =create_connection()
         
         cursor = db.cursor()
         
@@ -467,7 +512,8 @@ def creer_table_suivi_nutritionnel():
             id_joueur INT NOT NULL,
             groupe VARCHAR(50) NOT NULL,
             date_creation DATE NOT NULL,
-            periode_test ENUM('Période 1', 'Période 2', 'Période 3', 'Période 4', 'Période 5') NOT NULL,
+            periode_test ENUM('Période 1', 'Période 2', 'Période 3', 'Période 4', 'Période 5') NOT NULL DEFAULT 'Période 1',
+            
             
             
             -- Données de base
@@ -477,8 +523,8 @@ def creer_table_suivi_nutritionnel():
             imc DECIMAL(5,2) GENERATED ALWAYS AS (poids_depart/(taille*taille)) STORED,
             
             -- Objectifs
-            objectif ENUM('Perte poids', 'Prise masse', 'Maintien', 'Optimisation performance', 'Récomposition corporelle') NOT NULL,
-            details_objectif TEXT COMMENT 'Détails de l\'objectif',
+            objectif ENUM('Perte poids', 'Prise masse', 'Maintien', 'Optimisation performance', 'Récomposition corporelle') NOT NULL DEFAULT 'Perte poids',
+            details_objectif TEXT COMMENT "Détails de l'objectif",
             
             -- Suivi nutritionnel
             regime_specifique TEXT COMMENT 'Détails du régime',
@@ -528,20 +574,14 @@ def creer_table_test_physique():
 
 def creer_table_evaluation_sur_periode():
     try:
-        db = pymysql.connect(
-            host="localhost",       # or your host name/IP address
-            user="root",          # your MySQL username
-            password="LAGLEG123",
-            database="my_database"  # optional if you want to connect to specific db
-        )
+        db =create_connection()
         
         cursor = db.cursor()
-        creer_fonction_moyenne_generale_sur_periode()
         req_creation = """
         CREATE TABLE IF NOT EXISTS evaluation_sur_periode (
             id INT AUTO_INCREMENT PRIMARY KEY,
             id_joueur INT NOT NULL,
-            periode ENUM('Période 1', 'Période 2', 'Période 3', 'Période 4', 'Période 5') NOT NULL,
+            periode_test ENUM('Période 1', 'Période 2', 'Période 3', 'Période 4', 'Période 5') NOT NULL DEFAULT 'Période 1',
             evaluation_date DATE NOT NULL,
             
             
@@ -553,16 +593,11 @@ def creer_table_evaluation_sur_periode():
             id_test_morphologique INT,
             id_test_medical INT,
             id_suivi_nutritionnel INT,
-            id_suivi_psychologique INT,
-            id_test_physique INT,
+
             
             
             -- Moyenne
-            moyenne_generale DECIMAL(3,2) GENERATED ALWAYS AS (
-                SELECT moyenne_generale_sur_periode(id_evaluation_technique,
-                id_evaluation_tactique, id_evaluation_comportementale)
-                )  
-            )STORED,
+            moyenne_generale DECIMAL(3,2),
             
             -- Contraintes et index
             FOREIGN KEY (id_joueur) REFERENCES joueur(id),
@@ -573,17 +608,13 @@ def creer_table_evaluation_sur_periode():
             FOREIGN KEY (id_test_morphologique) REFERENCES test_morphologique(id),
             FOREIGN KEY (id_test_medical) REFERENCES test_medical(id),
             FOREIGN KEY (id_suivi_nutritionnel) REFERENCES suivi_nutritionnel(id),
-            FOREIGN KEY (id_suivi_psychologique) REFERENCES suivi_psychologique(id),
-            FOREIGN KEY (id_test_physique) REFERENCES test_physique(id),
+
 
         
             INDEX idx_joueur (id_joueur),
-            INDEX idx_periode (date_debut, date_fin),
+            INDEX idx_periode (periode_test),
             UNIQUE KEY uk_joueur_date (id_joueur, evaluation_date),
-            UNIQUE KEY uk_joueur_periode (id_joueur, periode),
-            
-            -- Vérification que la date de fin est après la date de début
-            CONSTRAINT chk_dates CHECK (date_fin >= date_debut)
+            UNIQUE KEY uk_joueur_periode (id_joueur, periode_test)
         );
         """
         
@@ -599,16 +630,11 @@ def creer_table_evaluation_sur_periode():
 
 def creer_table_evaluation_sur_match():
     try:
-        db = pymysql.connect(
-            host="localhost",       # or your host name/IP address
-            user="root",          # your MySQL username
-            password="LAGLEG123",
-            database="my_database"  # optional if you want to connect to specific db
-        )
+        db =create_connection()
         
         cursor = db.cursor()
         
-        creer_fonction_moyenne_match()
+
         
         req_creation = """
         CREATE TABLE IF NOT EXISTS evaluation_sur_match (
@@ -621,21 +647,17 @@ def creer_table_evaluation_sur_match():
             id_evaluation_comportementale INT,
             
             -- Moyenne
-            moyenne_generale DECIMAL(3,2) GENERATED ALWAYS AS 
-            (SELECT moyenne_match(id_evaluation_technique,
-            id_evaluation_tactique, id_evaluation_comportementale)
-            )STORED,
-            
+            moyenne_generale DECIMAL(3,2),
             
             -- Contraintes et index
             FOREIGN KEY (id_joueur) REFERENCES joueur(id),
             FOREIGN KEY (id_evaluation_tactique) REFERENCES evaluation_tactique(id),
             FOREIGN KEY (id_evaluation_comportementale) REFERENCES evaluation_comportementale(id),
             FOREIGN KEY (id_evaluation_technique) REFERENCES evaluation_technique(id),
-            FOREIGN KEY (id_match) REFERENCES match(id),
+            FOREIGN KEY (id_match) REFERENCES matchs(id),
             
             INDEX idx_joueur (id_joueur),
-            INDEX idx_match (id_match),
+            INDEX idx_match (id_match)
         );
         """
         
@@ -655,9 +677,9 @@ def creer_table_evaluation_sur_match():
 
 # creer_table_joueur()
 # creer_table_match()
-create_table_evaluation_technique()
-creer_table_evaluation_tactique()
-creer_table_evaluation_comportementale()
+# creer_table_evaluation_technique()
+# creer_table_evaluation_tactique()
+# creer_table_evaluation_comportementale()
 # creer_table_test_athletique()
 # creer_table_test_morphologique()
 # creer_table_test_medical()

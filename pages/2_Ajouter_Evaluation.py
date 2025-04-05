@@ -1,16 +1,13 @@
 import streamlit as st
 from datetime import date
 from database import queries
-
-
-
     
     
 
     
 def creer_evaluation():
     st.title("Ajouter une Évaluation")
-    tab1,tab2 = st.tabs(["Évaluation Match","Évaluation sur periode"])
+    tab1,tab2 = st.tabs(["Évaluation sur periode","Évaluation Match"])
     with tab1:
         col1,col2,col3 = st.columns(3)
         with col1:

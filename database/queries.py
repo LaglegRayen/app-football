@@ -1,5 +1,5 @@
 import pymysql
-import utils
+from components import utils
 
 #fonction d'insertion
 def ajouter_joueur():
