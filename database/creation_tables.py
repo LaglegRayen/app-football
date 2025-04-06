@@ -9,8 +9,8 @@ def create_connection():
         connection = pymysql.connect(
             host="localhost",       # or your host name/IP address
             user="root",          # your MySQL username
-            password="LAGLEG123",
-            database="my_database"  # optional if you want to connect to specific db
+            password="2004",
+            database="my_database_test"  # optional if you want to connect to specific db
         )
         if connection in locals():
             print("Connection to the database was successful.")
@@ -22,8 +22,8 @@ def create_connection():
 #         db = pymysql.connect(
 #             host="localhost",       # or your host name/IP address
 #             user="root",          # your MySQL username
-#             password="LAGLEG123",
-#             database="my_database"  # optional if you want to connect to specific db
+#             password="2004",
+#             database="my_database_test"  # optional if you want to connect to specific db
 #         )
 #         cursor = db.cursor()
 #         query = """
@@ -56,8 +56,8 @@ def create_connection():
 #         db = pymysql.connect(
 #             host="localhost",       # or your host name/IP address
 #             user="root",          # your MySQL username
-#             password="LAGLEG123",
-#             database="my_database"  # optional if you want to connect to specific db
+#             password="2004",
+#             database="my_database_test"  # optional if you want to connect to specific db
 #         )
 #         cursor = db.cursor()
 #         query = """
@@ -954,10 +954,27 @@ def inserer_evaluation_sur_periode_pour_joueur_7():
             cursor.close()
             db.close()
 
+
+
+
+
+create_connection()
+
+# creer_table_joueur()
+# creer_table_match()
+# creer_table_evaluation_technique()
+# creer_table_evaluation_tactique()
+# creer_table_evaluation_comportementale()
+# creer_table_test_athletique()
+# creer_table_test_morphologique()
+# creer_table_test_medical()
+# creer_table_suivi_nutritionnel()
+# creer_table_suivi_psychologique()
+# creer_table_test_physique()
+# creer_table_evaluation_sur_periode()
+# creer_table_evaluation_sur_match()
+
 # inserer_15_joueurs()
-
 # inserer_sur_periodes_evaluations_pour_joueurs()
-
 # inserer_evaluations_par_match_pour_joueurs()
-
-# inserer_evaluation_sur_periode_pour_joueur_7()
+inserer_evaluation_sur_periode_pour_joueur_7()

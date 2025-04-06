@@ -4,8 +4,7 @@ from database import db_connection
 
 
 #fonction d'insertion
-def ajouter_joueur():
-    pass
+
 
 def ajouter_match(): 
     pass
@@ -275,32 +274,32 @@ def ajouter_match(date_match, lieu, adversaire, type_match, domicile, score_equi
             cursor.close()
             db.close()            
          
-def ajouter_joueur(nom, prenom, categorie, selection_nationale,
+def ajouter_joueur(nom_prenom, categorie, nationalities,
         poste_principal, pied_fort, taille, poids, date_naissance,
         matchs_joues, titulaire, remplacant, tempsjeu,
         buts, assists, carton_jaune, carton_rouge,
-        est_blessé, type_blessure, date_blessure,
+        est_blesse, type_blessure, date_blessure,
         date_retour_prevue, severite_blessure, description_blessure):
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
 
         query = """
-        INSERT INTO joueur (nom, prenom, categorie, selection_nationale, 
+        INSERT INTO joueur (nom_prenom, categorie, nationalities, 
         poste_principal, pied_fort, taille, poids, date_naissance, 
         matchs_joues, titulaire, remplacant, tempsjeu,
         buts, assists, carton_jaune, carton_rouge,
-        est_blessé, type_blessure, date_blessure,
+        est_blesse, type_blessure, date_blessure,
         date_retour_prevue, severite_blessure, description_blessure)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, 
-        %s, %s, %s, %s, %s, %s, %s, %s, %s);
+        %s, %s, %s, %s, %s, %s, %s, %s);
         """
-        cursor.execute(query, (nom, prenom, categorie,
-            selection_nationale, poste_principal,
+        cursor.execute(query, (nom_prenom, categorie,
+            nationalities, poste_principal,
             pied_fort, taille, poids, date_naissance, matchs_joues, 
             titulaire, remplacant, tempsjeu,
             buts, assists, carton_jaune, carton_rouge,
-            est_blessé, type_blessure, date_blessure,
+            est_blesse, type_blessure, date_blessure,
             date_retour_prevue, severite_blessure, description_blessure))
         db.commit()
         print("Joueur inséré avec succès!")
@@ -321,7 +320,7 @@ def recuperer_informations_joueur(joueur_id):
         db = db_connection.create_connection()
         cursor = db.cursor()
         query = """
-        SELECT nom, prenom, categorie, selection_nationale,
+        SELECT nom_prenom, categorie, nationalities,
         poste_principal, pied_fort, taille, poids, date_naissance,
         matchs_joues, titulaire, remplacant, tempsjeu,
         buts, assists, carton_jaune, carton_rouge,
@@ -669,15 +668,15 @@ def creer_fonction_moyenne_match():
             cursor.close()
             db.close()
                         
-def recuperer_id_joueur(nom, prenom):
+def recuperer_id_joueur(nom_prenom):
     result = None
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
         query = """
-        SELECT id FROM joueur WHERE nom like '{}' AND prenom like '{}';
+        SELECT id FROM joueur WHERE nom_prenom = %s;
         """
-        cursor.execute(query.format(nom, prenom))
+        cursor.execute(query, (nom_prenom,))
         result = cursor.fetchone()
         if not result:
             print("Aucun joueur trouvé avec ce nom et prénom.")
@@ -767,3 +766,24 @@ def selectionner_tous_les_matchs():
             
             
 
+def recuperer_joueurs(categorie):
+    result = None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = "SELECT nom_prenom  FROM joueur WHERE categorie like '%{}%';"
+        
+        cursor.execute(query.format(categorie))
+        
+        result = cursor.fetchall()
+
+        # Extract names from the fetched tuples and return them as a list
+        if not result:
+            print("Aucun joueur trouvé pour cette catégorie.")
+        return [row[0] for row in result]
+    except pymysql.Error as err:
+        print(f"Erreur lors de la récupération des joueurs: {err}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()

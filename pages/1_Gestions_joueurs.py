@@ -12,55 +12,96 @@ max_date = date.today()+dt.timedelta(days=1825)
 def inserer_joueur():
     st.header("Insertion d'un joueur")
     with st.form("form_insertion_joueur"):
-        nom = st.text_input("Nom")
-        prenom = st.text_input("Prénom")
-        categorie = st.selectbox("Catégorie", ["Junior", "Senior"])
-        selection_nationale = st.text_input("Sélection nationale")
-        poste_principal = st.selectbox("Poste principal", ["Gardien", "Défenseur", "Milieu", "Attaquant", "Latéral", "Pivot"])
-        pied_fort = st.selectbox("Pied fort", ["Droit", "Gauche", "Ambidextre"])
-        taille = st.number_input("Taille (cm)", min_value=100, max_value=250, step=1)
-        poids = st.number_input("Poids (kg)", min_value=30.0, max_value=150.0, step=0.1)
-        date_naissance = st.date_input("Date de naissance")
-        matchs_joues = st.number_input("Nombre de matchs joués", min_value=0, step=1)
-        titulaire = st.number_input("Nombre de matchs titulaires", min_value=0, step=1)
-        remplacant = st.number_input("Nombre de matchs remplaçant", min_value=0, step=1)
-        tempsjeu = st.number_input("Temps de jeu (minutes)", min_value=0, step=1)
-        buts = st.number_input("Buts marqués", min_value=0, step=1)
-        assists = st.number_input("Passes décisives", min_value=0, step=1)
-        carton_jaune = st.number_input("Cartons jaunes", min_value=0, step=1)
-        carton_rouge = st.number_input("Cartons rouges", min_value=0, step=1)
-        est_blesse = st.selectbox("Est blessé", ["Oui", "Non"])
-        if est_blesse == "Oui":
-            type_blessure = st.selectbox("Type de blessure", ['Musculaire', 'Articulaire', 'Fracture', 'Ligamentaire', 'Tendinite', 'Commotion', 'Autre'])
-            date_blessure = st.date_input("Date de blessure", min_value=min_date, max_value=max_date_today)
-            date_retour_prevue = st.date_input("Date de retour prévue", min_value=min_date, max_value=max_date)
-            severite_blessure = st.selectbox("Sévérité de la blessure", ['Légère', 'Modérée', 'Grave', 'Très grave'])
-            description_blessure = st.text_area("Description de la blessure")
+
+        st.subheader("1️⃣ informations générale")
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            nom_prenom = st.text_input("Nom et prénom du joueur")
+            nom_prenom = nom_prenom.strip()
+            categorie = st.selectbox("Catégorie", ['Ecole B', 'Ecole A', 'Minimes B', 'Minimes A', 'Cadets B', 'Cadets A', 'Juniors', 'Seniors B', 'Seniors'    ])
+            taille = st.number_input("Taille (cm)", min_value=100, max_value=250, step=1)
+
+        with col2:
+            date_naissance = st.date_input("Date de naissance")
+            poste_principal = st.selectbox("Poste principal", ["Gardien", "Arrière droit", "Défenseur central droit", "Défenseur central gauche", "Arrière gauche", "Milieu défensif", "Milieu central", "Milieu offensif", "Ailier droit", "Ailier gauche", "Attaquant"])
+            poids = st.number_input("Poids (kg)", min_value=30.0, max_value=150.0, step=0.1)
+
+        with col3:
+            nationalities = st.selectbox("Sélectionnez nationalité", ["Tunisie"])
+            pied_fort = st.selectbox("Pied fort", ["Droit", "Gauche", "Ambidextre"])
+
+        # 2️⃣ informations détaillée
+        st.subheader("2️⃣ informations détaillée")
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            matchs_joues = st.number_input("Nombre de matchs joués", min_value=0, step=1)
+            tempsjeu = st.number_input("Temps de jeu (minutes)", min_value=0, step=1)
+            carton_jaune = st.number_input("Cartons jaunes", min_value=0, step=1)
+
+        with col2:
+            titulaire = st.number_input("Nombre de matchs titulaires", min_value=0, step=1)
+            buts = st.number_input("Buts marqués", min_value=0, step=1)
+            carton_rouge = st.number_input("Cartons rouges", min_value=0, step=1)
+
+        with col3:
+            remplacant = st.number_input("Nombre de matchs remplaçant", min_value=0, step=1)
+            assists = st.number_input("Passes décisives", min_value=0, step=1)
+
+        # Checkbox to check if the player is injured
+        st.markdown("Est blessé")
+        est_blesse = st.checkbox("Oui")
+
+        # Display injury-related fields if the player is injured
+        if est_blesse: 
+            blesse = "Oui"
+
+            # Injury-related fields will only be displayed when the player is injured
+            with col1:
+                type_blessure = st.selectbox("Type de blessure", ['Musculaire', 'Articulaire', 'Fracture', 'Ligamentaire', 'Tendinite', 'Commotion', 'Autre'])
+                severite_blessure = st.selectbox("Sévérité de la blessure", ['Légère', 'Modérée', 'Grave', 'Très grave'])
+
+            with col2:
+                date_blessure = st.date_input("Date de blessure")
+                description_blessure = st.text_area("Description de la blessure")
+
+            with col3:
+                date_retour_prevue = st.date_input("Date de retour prévue")
+
         else:
+            blesse = "Non"
             type_blessure = None
-            date_blessure = None
-            date_retour_prevue = None
             severite_blessure = None
+            date_blessure = None
             description_blessure = None
-        
+            date_retour_prevue = None
+
+        # Submit button to insert the player
         if st.form_submit_button("Insérer"):
-            est_blesse = est_blesse == "Oui"
-            # queries.inserer_joueur(nom, prenom, categorie, selection_nationale,
-            #     poste_principal, pied_fort, taille, poids, date_naissance,
-            #     matchs_joues, titulaire, remplacant, tempsjeu,
-            #     buts, assists, carton_jaune, carton_rouge,
-            #     est_blessé, type_blessure, date_blessure,
-            #     date_retour_prevue, severite_blessure, description_blessure
-            #     )
-            st.success(f"Joueur {nom} {prenom} inséré avec succès!")
+            if not nom_prenom or not categorie or not taille or not date_naissance or not poste_principal or not poids or not nationalities or not pied_fort:
+                st.error("Veuillez remplir les informations générale.")
+            else:
+                # Call the function to add the player to the database
+                # Replace 'queries.ajouter_joueur' with your own insert function
+                queries.ajouter_joueur(
+                    nom_prenom, categorie, nationalities, poste_principal, pied_fort, taille, poids, date_naissance,
+                    matchs_joues, titulaire, remplacant, tempsjeu, buts, assists, carton_jaune, carton_rouge,
+                    blesse, type_blessure if est_blesse else None, date_blessure if est_blesse else None,
+                    date_retour_prevue if est_blesse else None, severite_blessure if est_blesse else None, description_blessure if est_blesse else None
+                )
+                st.success(f"Joueur {nom_prenom} inséré avec succès!")
+
+
+
+
 
 def afficher_statistiques_joueur():
     st.header("Informations du joueur")
-    nom = st.text_input("Nom du joueur")
-    prenom = st.text_input("Prénom du joueur")
+    nom_prenom = st.text_input("Nom et prénom du joueur")
     joueur_id = None
-    if nom and prenom:
-        joueur_id = queries.recuperer_id_joueur(nom, prenom)
+    if nom_prenom:
+        joueur_id = queries.recuperer_id_joueur(nom_prenom)
         if joueur_id:
             st.success(f"ID du joueur trouvé: {joueur_id}")
         else:
@@ -73,20 +114,20 @@ def afficher_statistiques_joueur():
             informations_joueur = [informations_joueur]
     
         informations_joueur_df_columns=[
-            "Nom", "Prénom", "Catégorie", "Sélection nationale", "Poste principal",
+            "Nom Prénom", "Catégorie", "Sélection nationale", "Poste principal",
             "Pied fort", "Taille (cm)", "Poids (kg)", "Date de naissance",
             "Matchs joués", "Titulaire", "Remplaçant", "Temps de jeu (minutes)",
             "Buts marqués", "Passes décisives", "Cartons jaunes", "Cartons rouges",
-            "Est blessé", "Type de blessure", "Date de blessure",
+            "Est blesse", "Type de blessure", "Date de blessure",
             "Date de retour prévue", "Sévérité de la blessure", "Description de la blessure"
         ]
         informations_joueur_df = pd.DataFrame(informations_joueur, columns=informations_joueur_df_columns)
-        if not informations_joueur_df["Est blessé"].any():
+        if not informations_joueur_df["Est blesse"].any():
             informations_joueur_df.drop(columns=["Type de blessure", "Date de blessure", "Date de retour prévue", "Sévérité de la blessure", "Description de la blessure"], inplace=True)
         
-        informations_joueur_df["Est blessé"] = informations_joueur_df["Est blessé"].replace({1: "Oui", 0: "Non"}) 
+        informations_joueur_df["Est blesse"] = informations_joueur_df["Est blesse"].replace({1: "Oui", 0: "Non"}) 
         horizontal_df = informations_joueur_df.transpose()
-        st.table(horizontal_df)
+        st.dataframe(horizontal_df, use_container_width=True)
         st.subheader("Évaluations Techniques, Tactiques et Comportementales")
         evaluations_generales = queries.recuperer_evaluations_generales(joueur_id)
 
@@ -101,8 +142,7 @@ def afficher_statistiques_joueur():
         evaluations = evaluations.sort_values(by="Date", ascending=True)
         
 
-        styled_evaluations_table = evaluations.style.set_properties(**{'white-space': 'nowrap'})
-        st.write(styled_evaluations_table.to_html(index= False), unsafe_allow_html=True)
+        st.dataframe(evaluations, use_container_width=True)
      
 
 
@@ -114,8 +154,7 @@ def afficher_statistiques_joueur():
             "Vitesse 30m", "Aerobie vameval vo2max", "VMA km/h", 
             "VMA m/s", "Yoyo pal"
         ])
-        styled_tests_athletiques_table = tests_athletiques_df.style.set_properties(**{'white-space': 'nowrap'})
-        st.write(styled_tests_athletiques_table.to_html(index= False), unsafe_allow_html=True)
+        st.dataframe(tests_athletiques_df, use_container_width=True)
         
         
         st.subheader("Tests Morphologiques")
@@ -124,8 +163,7 @@ def afficher_statistiques_joueur():
             "Periode", "Poids", "Taille", "IMC", "Masse grasse",
             "Classification IMC"
         ])
-        styled_tests_morphologiques_table = tests_morphologiques_df.style.set_properties(**{'white-space': 'nowrap'})
-        st.write(styled_tests_morphologiques_table.to_html(index= False), unsafe_allow_html=True)
+        st.dataframe(tests_morphologiques_df, use_container_width=True)
         
         
         
@@ -135,10 +173,8 @@ def afficher_statistiques_joueur():
             "Periode", "Taille", "Poids", "Masse grasse", "Examen général", 
             "Examen orthopédique", "Examen dentaire", "Examen ORL",  
             "Examen dermatologique", "Examen psychologique", "Commentaires"])
-        styled_tests_medicaux_table = tests_medicaux_df.style.set_properties(**{
-            'white-space': 'nowrap'})
-
-        st.write(styled_tests_medicaux_table.to_html(index= False), unsafe_allow_html=True)
+        
+        st.dataframe(tests_medicaux_df, use_container_width=True)
         
         
         
@@ -152,9 +188,7 @@ def afficher_statistiques_joueur():
            "Commentaires"
 
         ])
-        styled_suivi_nutritionnel_table = suivi_nutritionnel_df.style.set_properties(**{
-            'white-space': 'nowrap'})
-        st.write(styled_suivi_nutritionnel_table.to_html(index= False), unsafe_allow_html=True) 
+        st.dataframe(suivi_nutritionnel_df, use_container_width=True)
         
         
         
@@ -177,7 +211,7 @@ def comparer_joueurs():
             "Moyenne Comportementale": [data['moyenne_comportementale'] for data in donnees_joueurs.values()],
             "Moyenne Générale": [data['moyenne_generale'] for data in donnees_joueurs.values()],
         })
-        st.table(tableau_comparaison)
+        st.dataframe(tableau_comparaison, use_container_width=True)
 
         for joueur_id, evaluations in donnees_joueurs.items():
             st.write(f"### Détails pour le joueur ID {joueur_id}")
