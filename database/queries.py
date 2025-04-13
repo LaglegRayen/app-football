@@ -3,11 +3,7 @@ from components import utils
 from database import db_connection
 
 
-#fonction d'insertion
 
-
-def ajouter_match(): 
-    pass
 
 def ajouter_evaluation_technique(id_joueur,evaluation_date, qualite_premiere_touche, 
     qualite_passes, technique_defensive, sens_tactique_vision, vitesse_pensee, 
@@ -238,16 +234,16 @@ def ajouter_evaluation_sur_periode(id_joueur, periode, evaluation_date, id_evalu
         return id if id else None
             
 def ajouter_evaluation_sur_match(id_joueur, id_match, id_evaluation_technique,
-    id_evaluation_tactique, id_evaluation_comportementale):
+    id_evaluation_tactique, id_evaluation_comportementale,videopath):
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
         query = """
         INSERT INTO evaluation_sur_match (id_joueur, id_match, id_evaluation_technique,
-        id_evaluation_tactique, id_evaluation_comportementale) VALUES (%s,%s,%s,%s,%s);
+        id_evaluation_tactique, id_evaluation_comportementale, videopath) VALUES (%s,%s,%s,%s,%s,%s);
         """
         cursor.execute(query, (id_joueur, id_match, id_evaluation_technique,
-        id_evaluation_tactique, id_evaluation_comportementale))
+        id_evaluation_tactique, id_evaluation_comportementale, videopath))
         db.commit()
         id = cursor.lastrowid
         print("Évaluation ajoutée avec succès!")
@@ -317,7 +313,7 @@ def ajouter_joueur(nom_prenom, categorie, nationalities,
             db.close()           
 
 
-# Gestions_joueurs.py
+
 def recuperer_informations_joueur(joueur_id):
     result = None
     try:
@@ -353,10 +349,11 @@ def recuperer_evaluations_periode(joueur_id):
         db = db_connection.create_connection()
         cursor = db.cursor()
         query = """
-        SELECT 'Période' AS type, evaluation_sur_periode.evaluation_date,
+        SELECT evaluation_sur_periode.evaluation_date,
         evaluation_technique.moyenne_technique, evaluation_tactique.moyenne_tactique, 
         evaluation_comportementale.moyenne_comportementale,
         moyenne_generale
+        
         FROM evaluation_sur_periode,evaluation_technique , evaluation_tactique,
         evaluation_comportementale
         WHERE evaluation_sur_periode.id_evaluation_technique = evaluation_technique.id
@@ -424,13 +421,91 @@ def recuperer_evaluations_generales(joueur_id):
             cursor.close()
             db.close()
 
+def recuperer_evaluations_techniques_sur_periode(joueur_id):
+    result = None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = """
+        SELECT evaluation_technique.evaluation_date, qualite_premiere_touche, qualite_passes,
+        technique_defensive, sens_tactique_vision, vitesse_pensee,
+        anticipation, adaptation_adversaire, sens_replacement, sens_demarquage,
+        sens_marquage, technique_generale, jeu_tete, puissance_frappe, drible_feinte,
+        technique_au_poste, puissance_physique, rapidite, moyenne_technique
+        FROM evaluation_technique, evaluation_sur_periode
+        WHERE evaluation_sur_periode.id_evaluation_technique = evaluation_technique.id 
+        AND evaluation_sur_periode.id_joueur = %s
+        """
+        cursor.execute(query, (joueur_id,))
+        result = cursor.fetchall()
+        if not result:
+            print("Aucune évaluation technique trouvée pour ce joueur.")
+        return result
+    
+    except pymysql.Error as e:
+        print(f"Erreur lors de la récupération des évaluations techniques: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+
+def recuperer_evaluations_tactiques_sur_periode(joueur_id):
+    result= None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = """
+        SELECT evaluation_tactique.evaluation_date, intelligence_de_jeu, disponibilite,
+        jouer_vers_avant, jouer_dos_adversaires, changer_rythme, moyenne_tactique
+        FROM evaluation_tactique, evaluation_sur_periode
+        WHERE evaluation_sur_periode.id_evaluation_tactique = evaluation_tactique.id 
+        AND evaluation_sur_periode.id_joueur = %s
+        """
+        cursor.execute(query, (joueur_id,))
+        result = cursor.fetchall()
+        if not result:
+            print("Aucune évaluation tactique trouvée pour ce joueur.")
+        return result
+    except pymysql.Error as e:
+        print(f"Erreur lors de la récupération des évaluations tactiques: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+            
+def recuperer_evaluations_comportementales_sur_periode(joueur_id):
+    result = None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = """
+        SELECT evaluation_comportementale.evaluation_date, assiduite, motivation_volonte,
+        confiance_prise_risque, calme_maitrise_soi, combativite,
+        sportivite, amabilite, moyenne_comportementale
+        FROM evaluation_comportementale,evaluation_sur_periode
+        
+        WHERE evaluation_sur_periode.id_evaluation_comportementale = evaluation_comportementale.id 
+        AND evaluation_comportementale.id_joueur = %s
+        """
+        cursor.execute(query, (joueur_id,))
+        result = cursor.fetchall()
+        if not result:
+            print("Aucune évaluation comportementale trouvée pour ce joueur.")
+        return result
+    except pymysql.Error as e:
+        print(f"Erreur lors de la récupération des évaluations comportementales: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+
 def recuperer_evaluations_match(joueur_id):
     result = None
     try:
         db = db_connection.create_connection()
         cursor = db.cursor()
         query = """
-        SELECT 'Match' AS type,matchs.date_match, evaluation_technique.moyenne_technique, evaluation_tactique.moyenne_tactique,
+        SELECT matchs.date_match, evaluation_technique.moyenne_technique, evaluation_tactique.moyenne_tactique,
         evaluation_comportementale.moyenne_comportementale, evaluation_sur_match.moyenne_generale
         FROM evaluation_sur_match, evaluation_technique, evaluation_tactique,
         evaluation_comportementale, matchs
@@ -452,6 +527,85 @@ def recuperer_evaluations_match(joueur_id):
         if 'db' in locals():
             cursor.close()
             db.close()
+
+def recuperer_evaluations_techniques_sur_match(joueur_id):
+    result = None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = """
+        SELECT evaluation_technique.evaluation_date, qualite_premiere_touche, qualite_passes,
+        technique_defensive, sens_tactique_vision, vitesse_pensee,
+        anticipation, adaptation_adversaire, sens_replacement, sens_demarquage,
+        sens_marquage, technique_generale, jeu_tete, puissance_frappe, drible_feinte,
+        technique_au_poste, puissance_physique, rapidite, moyenne_technique
+        FROM evaluation_technique, evaluation_sur_match
+        WHERE evaluation_sur_match.id_evaluation_technique = evaluation_technique.id 
+        AND evaluation_sur_match.id_joueur = %s
+        """
+        cursor.execute(query, (joueur_id,))
+        result = cursor.fetchall()
+        if not result:
+            print("Aucune évaluation technique trouvée pour ce joueur.")
+        return result
+    
+    except pymysql.Error as e:
+        print(f"Erreur lors de la récupération des évaluations techniques: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+
+def recuperer_evaluations_tactiques_sur_match(joueur_id):
+    result= None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = """
+        SELECT evaluation_tactique.evaluation_date, intelligence_de_jeu, disponibilite,
+        jouer_vers_avant, jouer_dos_adversaires, changer_rythme, moyenne_tactique
+        FROM evaluation_tactique, evaluation_sur_match
+        WHERE evaluation_sur_match.id_evaluation_tactique = evaluation_tactique.id 
+        AND evaluation_sur_match.id_joueur = %s
+        """
+        cursor.execute(query, (joueur_id,))
+        result = cursor.fetchall()
+        if not result:
+            print("Aucune évaluation tactique trouvée pour ce joueur.")
+        return result
+    except pymysql.Error as e:
+        print(f"Erreur lors de la récupération des évaluations tactiques: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+            
+def recuperer_evaluations_comportementales_sur_match(joueur_id):
+    result = None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = """
+        SELECT evaluation_comportementale.evaluation_date, assiduite, motivation_volonte,
+        confiance_prise_risque, calme_maitrise_soi, combativite,
+        sportivite, amabilite, moyenne_comportementale
+        FROM evaluation_comportementale,evaluation_sur_match
+        
+        WHERE evaluation_sur_match.id_evaluation_comportementale = evaluation_comportementale.id 
+        AND evaluation_comportementale.id_joueur = %s
+        """
+        cursor.execute(query, (joueur_id,))
+        result = cursor.fetchall()
+        if not result:
+            print("Aucune évaluation comportementale trouvée pour ce joueur.")
+        return result
+    except pymysql.Error as e:
+        print(f"Erreur lors de la récupération des évaluations comportementales: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+
 
 def recuperer_tests_athletiques(joueur_id):
     result = None 
@@ -571,7 +725,29 @@ def recuperer_suivi_nutritionnel(joueur_id):
             db.close()
 
 
+def recuperer_adversaire(nom_prenom,evalation_date):
+    result = None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = """
+        SELECT adversaire
+        FROM matchs, joueur, evaluation_sur_match
+        WHERE matchs.id = evaluation_sur_match.id_match
+        AND joueur.id = evaluation_sur_match.id_joueur AND joueur.nom_prenom = %s AND date_match = %s;
+        """
+        cursor.execute(query, (nom_prenom, evalation_date))
+        result = cursor.fetchone()
+        if not result:
+            print("Aucun adversaire trouvé avec ce nom et prénom.")
+        return result[0] if result else None
 
+    except pymysql.Error as e:
+        print(f"Erreur lors de la récupération de l'adversaire: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
 
 
 
@@ -697,7 +873,43 @@ def recuperer_id_joueur(nom_prenom):
     print(result)
     return result[0] if result else None
 
+def update_joueur(joueur_id, updated_data):
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
 
+        query = """
+        UPDATE joueur
+        SET nom_prenom = %s, categorie = %s, nationalities = %s, poste_principal = %s,
+            pied_fort = %s, taille = %s, poids = %s, date_naissance = %s,
+            matchs_joues = %s, titulaire = %s, remplacant = %s, tempsjeu = %s,
+            buts = %s, assists = %s, carton_jaune = %s, carton_rouge = %s,
+            est_blesse = %s, type_blessure = %s, date_blessure = %s,
+            date_retour_prevue = %s, severite_blessure = %s, description_blessure = %s
+        WHERE id = %s
+        """
+        cursor.execute(query, (
+            updated_data["Nom Prénom"], updated_data["Catégorie"], updated_data["Sélection nationale"],
+            updated_data["Poste principal"], updated_data["Pied fort"], updated_data["Taille (cm)"],
+            updated_data["Poids (kg)"], updated_data["Date de naissance"], updated_data["Matchs joués"],
+            updated_data["Titulaire"], updated_data["Remplaçant"], updated_data["Temps de jeu (minutes)"],
+            updated_data["Buts marqués"], updated_data["Passes décisives"], updated_data["Cartons jaunes"],
+            updated_data["Cartons rouges"], updated_data["Est blesse"], updated_data["Type de blessure"],
+            updated_data["Date de blessure"], updated_data["Date de retour prévue"],
+            updated_data["Sévérité de la blessure"], updated_data["Description de la blessure"], joueur_id
+        ))
+        db.commit()
+        print("Joueur mis à jour avec succès!")
+    except pymysql.Error as e:
+        print(f"Erreur lors de la mise à jour du joueur: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+            
+            
+            
+            
         
 def recuperer_dates(Match):
     result = None

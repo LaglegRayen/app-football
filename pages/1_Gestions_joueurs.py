@@ -128,67 +128,158 @@ def afficher_statistiques_joueur():
         informations_joueur_df["Est blesse"] = informations_joueur_df["Est blesse"].replace({1: "Oui", 0: "Non"}) 
         horizontal_df = informations_joueur_df.transpose()
         st.dataframe(horizontal_df, use_container_width=True)
-        st.subheader("Évaluations Techniques, Tactiques et Comportementales")
-        evaluations_generales = queries.recuperer_evaluations_generales(joueur_id)
+        
+        
+        tab = st.tabs(["Évaluations sur periode", "Évaluations par matchs"])
+        with tab[0]:
+            
+            st.subheader("Évaluations generales: ")
+            evaluations_generales_sur_periode = queries.recuperer_evaluations_periode(joueur_id)
+            evaluations_sur_periode = pd.DataFrame(evaluations_generales_sur_periode, columns=[
+                "Date", "Moyenne Technique", "Moyenne Tactique", "Moyenne Comportementale","Moyenne Générale"
+            ])
+
+            evaluations_sur_periode = evaluations_sur_periode.sort_values(by="Date", ascending=True)
+            st.dataframe(evaluations_sur_periode, use_container_width=True)
+            
+            
+            
+            
+            st.subheader("Évaluations techniques: ")
+            evaluations_techniques_sur_periode = queries.recuperer_evaluations_techniques_sur_periode(joueur_id)
+            evaluations_techniques = pd.DataFrame(evaluations_techniques_sur_periode, columns=[
+                "Date","qualite premiere touche", "qualite passes", "technique defensive",
+                "sens tactique vision", "vitesse pensee", "anticipation", "adaptation adversaire", 
+                "sens replacement", "sens demarquage", "sens marquage", "technique generale", "jeu tete", 
+                "puissance frappe", "drible feinte", "technique au poste", "puissance physique", "rapidite",
+                "Moyenne"])
+
+            evaluations_techniques = evaluations_techniques.astype(str)
+            evaluations_techniques = evaluations_techniques.sort_values(by="Date", ascending=True)
+            st.dataframe(evaluations_techniques, use_container_width=True)
+            
+            
+            
+            st.subheader("Évaluations tactiques: ")
+            evaluations_tactiques_sur_periode = queries.recuperer_evaluations_tactiques_sur_periode(joueur_id)
+            evaluations_tactiques = pd.DataFrame(evaluations_tactiques_sur_periode, columns=[
+                "Date","intelligence de jeu", "disponibilite", "jouer vers avant", 
+                "jouer dos adversaires", "changer rythme", "Moyenne"])
+            
+            evaluations_tactiques = evaluations_tactiques.sort_values(by="Date", ascending=True)
+            st.dataframe(evaluations_tactiques, use_container_width=True)
+            
+            
+            st.subheader("Évaluations comportementales: ")
+            evaluations_comportementales_sur_periode = queries.recuperer_evaluations_comportementales_sur_periode(joueur_id)
+            evaluations_comportementales = pd.DataFrame(evaluations_comportementales_sur_periode, columns=[
+                "Date", "assiduite", "motivation volonte", "confiance prise risque", 
+                "calme maitrise soi", "combativite", "sportivite", "amabilite", "Moyenne"])
+            evaluations_comportementales = evaluations_comportementales.sort_values(by="Date", ascending=True)
+            st.dataframe(evaluations_comportementales, use_container_width=True)
 
 
-        
-        
-        evaluations = pd.DataFrame(evaluations_generales, columns=[
-            "Type", "Date", "Moyenne Technique", "Moyenne Tactique", "Moyenne Comportementale","Moyenne Générale"
-        ])
+            st.subheader("Tests Athlétiques")
+            tests_athletiques = queries.recuperer_tests_athletiques(joueur_id)
+            tests_athletiques_df = pd.DataFrame(tests_athletiques, columns=[
+                "Periode", "Detente horizontale", "Detente verticale", 
+                "Vitesse thalf test", "Vitesse 10m", "Vitesse 20m",
+                "Vitesse 30m", "Aerobie vameval vo2max", "VMA km/h", 
+                "VMA m/s", "Yoyo pal"
+            ])
+            st.dataframe(tests_athletiques_df, use_container_width=True)
+            
+            
+            st.subheader("Tests Morphologiques")
+            tests_morphologiques = queries.recuperer_tests_morphologiques(joueur_id)
+            tests_morphologiques_df = pd.DataFrame(tests_morphologiques, columns=[
+                "Periode", "Poids", "Taille", "IMC", "Masse grasse",
+                "Classification IMC"
+            ])
+            st.dataframe(tests_morphologiques_df, use_container_width=True)
+            
+            
+            
+            st.subheader("Tests medicaux")
+            tests_medicaux = queries.recuperer_tests_medicaux(joueur_id)
+            tests_medicaux_df = pd.DataFrame(tests_medicaux, columns=[
+                "Periode", "Taille", "Poids", "Masse grasse", "Examen général", 
+                "Examen orthopédique", "Examen dentaire", "Examen ORL",  
+                "Examen dermatologique", "Examen psychologique", "Commentaires"])
+            
+            st.dataframe(tests_medicaux_df, use_container_width=True)
+            
+            
+            
+            st.subheader("Suivi nutritionnel")
+            suivi_nutritionnel = queries.recuperer_suivi_nutritionnel(joueur_id)
+            suivi_nutritionnel_df = pd.DataFrame(suivi_nutritionnel, columns=[
+                "Periode", "Age", "Poids départ", "Taille", "Objectif", "Détails objectif",
+            "Régime spécifique", "Date premier suivi", "Date deuxième suivi", 
+            "Date troisième suivi", "Évaluation premier suivi","Évaluation deuxième suivi", 
+            "Évaluation troisième suivi", "Poids actuel", "Évolution poids", "Satisfaction",
+            "Commentaires"
 
+            ])
+            st.dataframe(suivi_nutritionnel_df, use_container_width=True)
+        
+        with tab[1]:
+            st.subheader("Évaluations generales: ")
+            evaluations_generales_sur_match = queries.recuperer_evaluations_match(joueur_id)
+            evaluations_sur_match = pd.DataFrame(evaluations_generales_sur_match, columns=[
+                "Date", "Moyenne Technique", "Moyenne Tactique", "Moyenne Comportementale","Moyenne Générale"
+            ])
 
-        evaluations = evaluations.sort_values(by="Date", ascending=True)
-        
+            evaluations_sur_match = evaluations_sur_match.sort_values(by="Date", ascending=True)
+            st.dataframe(evaluations_sur_match, use_container_width=True)
+            
+            
+            
+            
+            st.subheader("Évaluations techniques: ")
+            evaluations_techniques_sur_match = queries.recuperer_evaluations_techniques_sur_match(joueur_id)
+            evaluations_techniques = pd.DataFrame(evaluations_techniques_sur_match, columns=[
+                "Date","qualite premiere touche", "qualite passes", "technique defensive",
+                "sens tactique vision", "vitesse pensee", "anticipation", "adaptation adversaire", 
+                "sens replacement", "sens demarquage", "sens marquage", "technique generale", "jeu tete", 
+                "puissance frappe", "drible feinte", "technique au_poste", "puissance physique", "rapidite",
+                "Moyenne"])
 
-        st.dataframe(evaluations, use_container_width=True)
-     
+            evaluations_techniques = evaluations_techniques.sort_values(by="Date", ascending=True)
+            st.dataframe(evaluations_techniques, use_container_width=True)
+            
+            
+            
+            st.subheader("Évaluations tactiques: ")
+            evaluations_tactiques_sur_match = queries.recuperer_evaluations_tactiques_sur_match(joueur_id)
+            evaluations_tactiques = pd.DataFrame(evaluations_tactiques_sur_match, columns=[
+                "Date","intelligence de jeu", "disponibilite", "jouer vers avant", 
+                "jouer dos adversaires", "changer rythme", "Moyenne"])
+            
+            evaluations_tactiques = evaluations_tactiques.sort_values(by="Date", ascending=True)
+            st.dataframe(evaluations_tactiques, use_container_width=True)
+            
+            
+            st.subheader("Évaluations comportementales: ")
+            evaluations_comportementales_sur_match = queries.recuperer_evaluations_comportementales_sur_match(joueur_id)
+            evaluations_comportementales = pd.DataFrame(evaluations_comportementales_sur_match, columns=[
+                "Date", "assiduite", "motivation volonte", "confiance prise risque", 
+                "calme maitrise soi", "combativite", "sportivite", "amabilite", "Moyenne"])
+            evaluations_comportementales = evaluations_comportementales.sort_values(by="Date", ascending=True)
+            st.dataframe(evaluations_comportementales, use_container_width=True)
 
-
-        st.subheader("Tests Athlétiques")
-        tests_athletiques = queries.recuperer_tests_athletiques(joueur_id)
-        tests_athletiques_df = pd.DataFrame(tests_athletiques, columns=[
-            "Periode", "Detente horizontale", "Detente verticale", 
-            "Vitesse thalf test", "Vitesse 10m", "Vitesse 20m",
-            "Vitesse 30m", "Aerobie vameval vo2max", "VMA km/h", 
-            "VMA m/s", "Yoyo pal"
-        ])
-        st.dataframe(tests_athletiques_df, use_container_width=True)
-        
-        
-        st.subheader("Tests Morphologiques")
-        tests_morphologiques = queries.recuperer_tests_morphologiques(joueur_id)
-        tests_morphologiques_df = pd.DataFrame(tests_morphologiques, columns=[
-            "Periode", "Poids", "Taille", "IMC", "Masse grasse",
-            "Classification IMC"
-        ])
-        st.dataframe(tests_morphologiques_df, use_container_width=True)
+            numero_match = st.number_input("video du match numero ", min_value=0, max_value=evaluations_sur_match.shape[0])
+            if st.button("Afficher la vidéo"):
+                # print("evaluations-matchs-vids/evaluation-{}-{}-{}mp4".format(nom_prenom, str(queries.recuperer_adversaire(nom_prenom,evaluations_sur_match.iloc[numero_match]["Date"])),str(evaluations_sur_match.iloc[numero_match-1]["Date"])))
+                st.video("evaluations-matchs-vids/evaluation-{}-{}-{}.mp4".format(nom_prenom, str(queries.recuperer_adversaire(nom_prenom,evaluations_sur_match.iloc[numero_match]["Date"])),str(evaluations_sur_match.iloc[numero_match-1]["Date"].date())))
         
         
         
-        st.subheader("Tests medicaux")
-        tests_medicaux = queries.recuperer_tests_medicaux(joueur_id)
-        tests_medicaux_df = pd.DataFrame(tests_medicaux, columns=[
-            "Periode", "Taille", "Poids", "Masse grasse", "Examen général", 
-            "Examen orthopédique", "Examen dentaire", "Examen ORL",  
-            "Examen dermatologique", "Examen psychologique", "Commentaires"])
-        
-        st.dataframe(tests_medicaux_df, use_container_width=True)
         
         
         
-        st.subheader("Suivi nutritionnel")
-        suivi_nutritionnel = queries.recuperer_suivi_nutritionnel(joueur_id)
-        suivi_nutritionnel_df = pd.DataFrame(suivi_nutritionnel, columns=[
-            "Periode", "Age", "Poids départ", "Taille", "Objectif", "Détails objectif",
-           "Régime spécifique", "Date premier suivi", "Date deuxième suivi", 
-           "Date troisième suivi", "Évaluation premier suivi","Évaluation deuxième suivi", 
-           "Évaluation troisième suivi", "Poids actuel", "Évolution poids", "Satisfaction",
-           "Commentaires"
-
-        ])
-        st.dataframe(suivi_nutritionnel_df, use_container_width=True)
+        
+        
         
         
         
@@ -217,11 +308,95 @@ def comparer_joueurs():
             st.write(f"### Détails pour le joueur ID {joueur_id}")
             st.write(evaluations)
 
+
+def modification_suppression_joueur():
+    st.header("Informations du joueur")
+    nom_prenom = st.text_input("Nom et prénom du joueur", key = "nom_prenom_modif")
+    joueur_id = None
+    if nom_prenom:
+        joueur_id = queries.recuperer_id_joueur(nom_prenom)
+        if joueur_id:
+            st.success(f"ID du joueur trouvé: {joueur_id}")
+        else:
+            st.warning("Aucun joueur trouvé avec ce nom et prénom.")
+    
+    if joueur_id:
+        st.subheader(f"Informations du joueur:")
+        informations_joueur = queries.recuperer_informations_joueur(joueur_id)
+        if isinstance(informations_joueur, tuple):
+            informations_joueur = [informations_joueur]
+    
+        informations_joueur_df_columns=[
+            "Nom Prénom", "Catégorie", "Sélection nationale", "Poste principal",
+            "Pied fort", "Taille (cm)", "Poids (kg)", "Date de naissance",
+            "Matchs joués", "Titulaire", "Remplaçant", "Temps de jeu (minutes)",
+            "Buts marqués", "Passes décisives", "Cartons jaunes", "Cartons rouges",
+            "Est blesse", "Type de blessure", "Date de blessure",
+            "Date de retour prévue", "Sévérité de la blessure", "Description de la blessure"
+        ]
+        informations_joueur_df = pd.DataFrame(informations_joueur, columns=informations_joueur_df_columns)
+        
+        
+        informations_joueur_df["Est blesse"] = informations_joueur_df["Est blesse"].replace({1: "Oui", 0: "Non"}) 
+
+        general_info_df = informations_joueur_df[[
+        "Nom Prénom", "Catégorie", "Sélection nationale", "Poste principal",
+        "Pied fort", "Taille (cm)", "Poids (kg)", "Date de naissance"
+        ]]
+
+        stats_df = informations_joueur_df[[
+            "Matchs joués", "Titulaire", "Remplaçant", "Temps de jeu (minutes)",
+            "Buts marqués", "Passes décisives", "Cartons jaunes", "Cartons rouges"
+        ]]
+
+        injury_info_df = informations_joueur_df[[
+            "Est blesse", "Type de blessure", "Date de blessure",
+            "Date de retour prévue", "Sévérité de la blessure", "Description de la blessure"
+        ]]
+        
+        
+        st.markdown("#### Informations Générales")
+        edited_general_info_df = st.data_editor(general_info_df, use_container_width=True)
+
+        st.markdown("#### Statistiques")
+        edited_stats_df = st.data_editor(stats_df, use_container_width=True)
+
+        st.markdown("#### Informations sur les Blessures")
+        edited_injury_info_df = st.data_editor(injury_info_df, use_container_width=True)
+
+
+        if st.button("Enregistrer les modifications"):
+
+            updated_general_info = edited_general_info_df.iloc[0].to_dict()
+            updated_stats = edited_stats_df.iloc[0].to_dict()
+            updated_injury_info = edited_injury_info_df.iloc[0].to_dict()
+
+
+            updated_data = {**updated_general_info, **updated_stats, **updated_injury_info}
+
+            if "Est blesse" in updated_data:
+                updated_data["Est blesse"] = 1 if updated_data["Est blesse"] == "Oui" else 0
+
+            queries.update_joueur(joueur_id, updated_data)
+            st.success("Les informations du joueur ont été mises à jour avec succès!")
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
 def main():
     st.title("Gestion des joueurs")
     
     # Tabs for different functionalities
-    onglet = st.tabs(["Insertion d'un joueur", "statistiques joueur", "Comparer les joueurs"])
+    onglet = st.tabs(["Insertion d'un joueur", "statistiques joueur", "Comparer les joueurs", "modification et suppression"])
     
     with onglet[0]:
         inserer_joueur()
@@ -232,6 +407,8 @@ def main():
     with onglet[2]:
         pass
         # comparer_joueurs()
+    with onglet[3]:
+        modification_suppression_joueur()
 
 if __name__ == "__main__":
     main()
