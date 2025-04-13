@@ -14,7 +14,9 @@ def ajouter_evaluation_technique(id_joueur,evaluation_date, qualite_premiere_tou
     anticipation, adaptation_adversaire, sens_replacement, sens_demarquage, 
     sens_marquage, technique_generale, jeu_tete, puissance_frappe, drible_feinte, 
     technique_au_poste, puissance_physique, rapidite):
+    id = None
     try:
+        
         db =db_connection.create_connection()
         cursor = db.cursor()
         moy = (qualite_premiere_touche + qualite_passes + technique_defensive + sens_tactique_vision + vitesse_pensee + anticipation + adaptation_adversaire + sens_replacement + sens_demarquage + sens_marquage + technique_generale + jeu_tete + puissance_frappe + drible_feinte + technique_au_poste + puissance_physique + rapidite) / 17
@@ -34,7 +36,7 @@ def ajouter_evaluation_technique(id_joueur,evaluation_date, qualite_premiere_tou
         db.commit()
         id = cursor.lastrowid
         print("Évaluation technique ajoutée avec succès!")
-        
+        return id
         
     except pymysql.Error as e:
         print(f"Erreur lors de l'insertion de l'évaluation technique: {e}")
@@ -44,12 +46,11 @@ def ajouter_evaluation_technique(id_joueur,evaluation_date, qualite_premiere_tou
             cursor.close()
             db.close()
     
-    return id if id else None
   
 def ajouter_evaluation_tactique(id_joueur, evaluation_date, 
     intelligence_de_jeu, disponibilite, jouer_vers_avant,
     jouer_dos_adversaires, changer_rythme):
-    
+    id = None
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
@@ -65,18 +66,18 @@ def ajouter_evaluation_tactique(id_joueur, evaluation_date,
         
         id = cursor.lastrowid
         print("Évaluation tactique ajoutée avec succès!")
+        return id
     except pymysql.Error as e:
         print(f"Erreur lors de l'insertion de l'évaluation tactique: {e}")
     finally:
         if 'db' in locals():
             cursor.close()
-            db.close()
-    return id if id else None      
+            db.close()    
         
 def ajouter_evaluation_comportementale(id_joueur, evaluation_date, assiduite, 
     motivation_volonte, confiance_prise_risque, calme_maitrise_soi, combativite,
     sportivite, amabilite):
-    
+    id = None
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
@@ -91,17 +92,19 @@ def ajouter_evaluation_comportementale(id_joueur, evaluation_date, assiduite,
         db.commit()
         id = cursor.lastrowid
         print("Évaluation comportementale ajoutée avec succès!")
+        return id
     except pymysql.Error as e:
         print(f"Erreur lors de l'insertion de l'évaluation comportementale: {e}")
     finally:
         if 'db' in locals():
             cursor.close()
             db.close()
-    return id if id else None      
+    
         
 def ajouter_test_athletique(id_joueur, categorie, date_test, periode_test, 
     detente_horizontale, detente_verticale, vitesse_thalf_test, vitesse_10m,
     vitesse_20m, vitesse_30m, aerobie_vameval_vo2max, vma_kmh, vma_ms, yoyo_pal):
+    id = None
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
@@ -115,6 +118,7 @@ def ajouter_test_athletique(id_joueur, categorie, date_test, periode_test,
         db.commit()
         id = cursor.lastrowid
         print("Test athlétique ajouté avec succès!")
+        return id
     except pymysql.Error as e:
         print(f"Erreur lors de l'insertion du test athlétique: {e}")
     finally:
@@ -122,7 +126,7 @@ def ajouter_test_athletique(id_joueur, categorie, date_test, periode_test,
             cursor.close()
             db.close()
             
-    return id if id else None
+
 
 def ajouter_test_morphologique(id_joueur, date_test, periode_test, poids, taille, masse_grasse):
     try:
@@ -696,14 +700,19 @@ def recuperer_id_joueur(nom_prenom):
 
         
 def recuperer_dates(Match):
+    result = None
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
         query = """
-        SELECT date_match FROM match WHERE adversaire = %s;"""
+        SELECT date_match FROM matchs WHERE adversaire = %s;"""
         cursor.execute(query, (utils.clean_string(Match),))
         result = cursor.fetchall()
+        if not result:
+            print("Aucun match trouve dans cette date")
+            return 
         dates = [row[0] for row in result]
+        return dates
     except pymysql.Error as e:
         print(f"Erreur lors de la récupération des dates: {e}")
     finally:    
@@ -713,20 +722,22 @@ def recuperer_dates(Match):
     return dates if dates else None
       
 def recuperer_id_match(Match,date_match):
+    result = None
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
         query = """
-        SELECT id_match FROM match WHERE adversaire = %s AND date_match = %s;"""
+        SELECT id FROM matchs WHERE adversaire = %s AND date_match = %s;"""
         cursor.execute(query, (utils.clean_string(Match),date_match))
         result = cursor.fetchone()
+        return result[0]
     except pymysql.Error as e:
         print(f"Erreur lors de la récupération de l'id du match: {e}")
     finally:    
         if 'db' in locals():
             cursor.close()
             db.close()
-    return result[0] if result else None
+    
     
 
 

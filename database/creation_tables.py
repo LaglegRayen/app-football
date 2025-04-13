@@ -9,7 +9,7 @@ def create_connection():
         connection = pymysql.connect(
             host="localhost",       # or your host name/IP address
             user="root",          # your MySQL username
-            password="2004",
+            password="1234",
             database="my_database_test"  # optional if you want to connect to specific db
         )
         if connection in locals():
@@ -22,7 +22,7 @@ def create_connection():
 #         db = pymysql.connect(
 #             host="localhost",       # or your host name/IP address
 #             user="root",          # your MySQL username
-#             password="2004",
+#             password="1234",
 #             database="my_database_test"  # optional if you want to connect to specific db
 #         )
 #         cursor = db.cursor()
@@ -56,7 +56,7 @@ def create_connection():
 #         db = pymysql.connect(
 #             host="localhost",       # or your host name/IP address
 #             user="root",          # your MySQL username
-#             password="2004",
+#             password="1234",
 #             database="my_database_test"  # optional if you want to connect to specific db
 #         )
 #         cursor = db.cursor()

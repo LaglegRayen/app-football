@@ -246,28 +246,39 @@ def ajouter_evaluation_sur_match():
     st.subheader("Informations du Joueur")
     # Informations du joueur
     with st.form("form_evaluation_sur_match"):
-        nom = st.text_input("Nom du Joueur", key = "nom_tab2")
-        prenom = st.text_input("Prénom du Joueur", key = "prenom_tab2")
-        evaluation_date = st.date_input("Date de l'Évaluation", min_value=min_date, max_value=max_date)
+        categorie = st.selectbox("Catégorie", ['Ecole B', 'Ecole A', 'Minimes B', 'Minimes A', 'Cadets B', 'Cadets A', 'Juniors', 'Seniors B', 'Senior'])
+
+        # Fetch the player list based on the selected category
+
+        nom_prenom_list = queries.recuperer_joueurs(categorie)
+
+        # Create the 'Nom et Prénom du Joueur' selectbox with the fetched player names
+        if nom_prenom_list:
+            nom_prenom = st.selectbox("Nom et Prénom du Joueur", list(nom_prenom_list))
+        else:
+            st.warning("Aucun joueur trouvé pour cette catégorie.")
+
+
         Match = st.text_input("Match")
+        Match = Match.upper()
         joueur_id = None
-    
-        if nom and prenom:
-                joueur_id = queries.recuperer_id_joueur(nom, prenom)
+        date_match = None
+        if nom_prenom:
+                joueur_id = queries.recuperer_id_joueur(nom_prenom)
                 if joueur_id:
                     st.success(f"ID du joueur trouvé: {joueur_id}")
                 else:
                     st.warning("Aucun joueur trouvé avec ce nom et prénom.")
         if Match:
             date_list = [Date for Date in queries.recuperer_dates(Match)]
-            date_match = st.selectbox("Date du Match", date_list, min_value=min_date, max_value=max_date)
+            date_match = st.selectbox("Date du Match", date_list)
             id_match = queries.recuperer_id_match(Match,date_match)
+        
             if id_match:
                 st.success(f"ID du match trouvé: {id_match}")
             else:
                 st.warning("Aucun match trouvé avec ce nom et cette date.")
-        else:
-            id_match = None
+        
         
         # Evaluation technique
             st.subheader("1️⃣ Évaluation Technique")
@@ -346,21 +357,21 @@ def ajouter_evaluation_sur_match():
                 st.warning("Veuillez d'abord verifier le nom et la date du match.")
                 return
             
-            id_evaluation_technique = queries.ajouter_evaluation_technique(id_joueur,evaluation_date, qualite_premiere_touche,
+            id_evaluation_technique = queries.ajouter_evaluation_technique(joueur_id,date_match, qualite_premiere_touche,
                 qualite_passes, technique_defensive, sens_tactique_vision, vitesse_pensee,
                 anticipation, adaptation_adversaire, sens_replacement, sens_demarquage, sens_marquage,
                 technique_generale, jeu_tete, puissance_frappe, drible_feinte,
                 technique_au_poste, puissance_physique, rapidite)
             
         
-            id_evaluation_tactique = queries.ajouter_evaluation_tactique(id_joueur, evaluation_date, intelligence_de_jeu, disponibilite, jouer_vers_avant,
+            id_evaluation_tactique = queries.ajouter_evaluation_tactique(joueur_id, date_match, intelligence_de_jeu, disponibilite, jouer_vers_avant,
                 jouer_dos_adversaires, changer_rythme)
             
-            id_evaluation_comportementale = queries.ajouter_evaluation_comportementale(id_joueur, evaluation_date, 
+            id_evaluation_comportementale = queries.ajouter_evaluation_comportementale(joueur_id, date_match, 
                 assiduite, motivation_volonte, confiance_prise_risque,    
                 calme_maitrise_soi, combativite, sportivite, amabilite)
             queries.ajouter_evaluation_sur_match(
-                id_joueur,
+                joueur_id,
                 id_match,
                 id_evaluation_technique,
                 id_evaluation_tactique,
