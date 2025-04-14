@@ -2,7 +2,36 @@ import pymysql
 from components import utils
 from database import db_connection
 
+def supprimer_joueur(joueur_id):
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        tables_to_clear = [
+            "evaluation_sur_match",
+            "evaluation_sur_periode",
+            "evaluation_technique",
+            "evaluation_tactique",
+            "evaluation_comportementale",
+            "test_athletique",
+            "test_morphologique",
+            "test_medical",
+            "suivi_nutritionnel"
 
+        ]
+        
+        for table in tables_to_clear:
+            query = f"DELETE FROM {table} WHERE id_joueur = %s"
+            cursor.execute(query, (joueur_id,))
+        query = "DELETE FROM joueur WHERE id = %s"
+        cursor.execute(query, (joueur_id,))
+        db.commit()
+        print("Joueur supprimé avec succès!")
+    except pymysql.Error as e:
+        print(f"Erreur lors de la suppression du joueur: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
 
 
 def ajouter_evaluation_technique(id_joueur,evaluation_date, qualite_premiere_touche, 

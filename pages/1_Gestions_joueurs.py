@@ -3,7 +3,8 @@ import pandas as pd
 from database import queries
 from datetime import date
 import datetime as dt
-
+import os
+import matplotlib.pyplot as plt
 min_date = date(2000, 1, 1)    
 max_date_today = date.today()
 max_date = date.today()+dt.timedelta(days=1825) 
@@ -229,12 +230,26 @@ def afficher_statistiques_joueur():
             evaluations_sur_match = pd.DataFrame(evaluations_generales_sur_match, columns=[
                 "Date", "Moyenne Technique", "Moyenne Tactique", "Moyenne Comportementale","Moyenne Générale"
             ])
-
+            for col in ["Moyenne Technique", "Moyenne Tactique", "Moyenne Comportementale", "Moyenne Générale"]:
+                evaluations_sur_match[col] = evaluations_sur_match[col].astype(str).str.replace(r'[^\d.]', '', regex=True)
+                evaluations_sur_match[col] = pd.to_numeric(evaluations_sur_match[col], errors='coerce')
+            evaluations_sur_match["Date"] = pd.to_datetime(evaluations_sur_match["Date"])
             evaluations_sur_match = evaluations_sur_match.sort_values(by="Date", ascending=True)
             st.dataframe(evaluations_sur_match, use_container_width=True)
+
+
+            st.subheader("Performance du joueur au fil du temps")
             
             
-            
+            if not evaluations_sur_match.empty:
+                performance_data = evaluations_sur_match.set_index("Date")[[
+                    "Moyenne Technique", "Moyenne Tactique", "Moyenne Comportementale", "Moyenne Générale"
+                ]]
+                print (evaluations_sur_match)
+                st.line_chart(performance_data)
+            else:
+                st.warning("Aucune donnée disponible pour afficher la performance.")
+                
             
             st.subheader("Évaluations techniques: ")
             evaluations_techniques_sur_match = queries.recuperer_evaluations_techniques_sur_match(joueur_id)
@@ -244,10 +259,14 @@ def afficher_statistiques_joueur():
                 "sens replacement", "sens demarquage", "sens marquage", "technique generale", "jeu tete", 
                 "puissance frappe", "drible feinte", "technique au_poste", "puissance physique", "rapidite",
                 "Moyenne"])
-
+            
+            evaluations_techniques["Moyenne"] = evaluations_techniques["Moyenne"].astype(str).str.replace(r'[^\d.]', '', regex=True)
+            evaluations_techniques["Moyenne"] = pd.to_numeric(evaluations_techniques["Moyenne"], errors='coerce')
             evaluations_techniques = evaluations_techniques.sort_values(by="Date", ascending=True)
             st.dataframe(evaluations_techniques, use_container_width=True)
             
+            if not evaluations_techniques.empty:
+                st.line_chart(evaluations_techniques.set_index("Date")[["Moyenne"]])
             
             
             st.subheader("Évaluations tactiques: ")
@@ -255,24 +274,53 @@ def afficher_statistiques_joueur():
             evaluations_tactiques = pd.DataFrame(evaluations_tactiques_sur_match, columns=[
                 "Date","intelligence de jeu", "disponibilite", "jouer vers avant", 
                 "jouer dos adversaires", "changer rythme", "Moyenne"])
-            
+            evaluations_tactiques["Moyenne"] = evaluations_tactiques["Moyenne"].astype(str).str.replace(r'[^\d.]', '', regex=True)
+            evaluations_tactiques["Moyenne"] = pd.to_numeric(evaluations_tactiques["Moyenne"], errors='coerce')
             evaluations_tactiques = evaluations_tactiques.sort_values(by="Date", ascending=True)
             st.dataframe(evaluations_tactiques, use_container_width=True)
             
+            if not evaluations_tactiques.empty:
+                st.line_chart(evaluations_tactiques.set_index("Date")[["Moyenne"]])
             
             st.subheader("Évaluations comportementales: ")
             evaluations_comportementales_sur_match = queries.recuperer_evaluations_comportementales_sur_match(joueur_id)
             evaluations_comportementales = pd.DataFrame(evaluations_comportementales_sur_match, columns=[
                 "Date", "assiduite", "motivation volonte", "confiance prise risque", 
                 "calme maitrise soi", "combativite", "sportivite", "amabilite", "Moyenne"])
+            evaluations_comportementales["Moyenne"] = evaluations_comportementales["Moyenne"].astype(str).str.replace(r'[^\d.]', '', regex=True)
+            evaluations_comportementales["Moyenne"] = pd.to_numeric(evaluations_comportementales["Moyenne"], errors='coerce')
             evaluations_comportementales = evaluations_comportementales.sort_values(by="Date", ascending=True)
             st.dataframe(evaluations_comportementales, use_container_width=True)
+            
+            if not evaluations_comportementales.empty:
+                st.line_chart(evaluations_comportementales.set_index("Date")[["Moyenne"]])
+            
+            cols = st.columns(3)
+            afficher = False
+            with cols[0]:
+                numero_match = st.number_input("Numéro du match", min_value=1, max_value=evaluations_sur_match.shape[0])
+            
+            with cols[1]:
+                st.markdown("<br>", unsafe_allow_html=True)
+                
+                afficher = st.button("Afficher la vidéo")
+            
+            if afficher:
+                
+                videopath = "evaluations-matchs-vids/evaluation-{}-{}-{}.mp4".format(nom_prenom,
+                    str(queries.recuperer_adversaire(nom_prenom,
+                        evaluations_sur_match.iloc[numero_match]["Date"])),
+                    str(evaluations_sur_match.iloc[numero_match-1]["Date"].date()))
+                try:
+                    if os.path.exists(videopath):
+                        st.video(videopath)
+                    else:
+                        st.error("La vidéo pour ce match n'a pas été trouvée.")
+                except Exception as e:
+                    st.error(f"Une erreur s'est produite lors de l'affichage de la vidéo : {e}")
+                
+                
 
-            numero_match = st.number_input("video du match numero ", min_value=0, max_value=evaluations_sur_match.shape[0])
-            if st.button("Afficher la vidéo"):
-                # print("evaluations-matchs-vids/evaluation-{}-{}-{}mp4".format(nom_prenom, str(queries.recuperer_adversaire(nom_prenom,evaluations_sur_match.iloc[numero_match]["Date"])),str(evaluations_sur_match.iloc[numero_match-1]["Date"])))
-                st.video("evaluations-matchs-vids/evaluation-{}-{}-{}.mp4".format(nom_prenom, str(queries.recuperer_adversaire(nom_prenom,evaluations_sur_match.iloc[numero_match]["Date"])),str(evaluations_sur_match.iloc[numero_match-1]["Date"].date())))
-        
         
         
         
@@ -364,21 +412,28 @@ def modification_suppression_joueur():
         st.markdown("#### Informations sur les Blessures")
         edited_injury_info_df = st.data_editor(injury_info_df, use_container_width=True)
 
+        cols = st.columns(3)
+        with cols[0]:
+            if st.button("Enregistrer les modifications"):
 
-        if st.button("Enregistrer les modifications"):
-
-            updated_general_info = edited_general_info_df.iloc[0].to_dict()
-            updated_stats = edited_stats_df.iloc[0].to_dict()
-            updated_injury_info = edited_injury_info_df.iloc[0].to_dict()
+                updated_general_info = edited_general_info_df.iloc[0].to_dict()
+                updated_stats = edited_stats_df.iloc[0].to_dict()
+                updated_injury_info = edited_injury_info_df.iloc[0].to_dict()
 
 
-            updated_data = {**updated_general_info, **updated_stats, **updated_injury_info}
+                updated_data = {**updated_general_info, **updated_stats, **updated_injury_info}
 
-            if "Est blesse" in updated_data:
-                updated_data["Est blesse"] = 1 if updated_data["Est blesse"] == "Oui" else 0
+                if "Est blesse" in updated_data:
+                    updated_data["Est blesse"] = 1 if updated_data["Est blesse"] == "Oui" else 0
 
-            queries.update_joueur(joueur_id, updated_data)
-            st.success("Les informations du joueur ont été mises à jour avec succès!")
+                queries.update_joueur(joueur_id, updated_data)
+                st.success("Les informations du joueur ont été mises à jour avec succès!")
+        with cols[1]:
+            if st.button("Supprimer le joueur"):
+                queries.supprimer_joueur(joueur_id)
+                st.success("Le joueur a été supprimé avec succès!")
+            
+        
 
         
         
