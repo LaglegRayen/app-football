@@ -9,8 +9,8 @@ def create_connection():
         connection = pymysql.connect(
             host="localhost",       # or your host name/IP address
             user="root",          # your MySQL username
-            password="1234",
-            database="my_database_test"  # optional if you want to connect to specific db
+            password="2004",
+            database="my_database"  # optional if you want to connect to specific db
         )
         if connection in locals():
             print("Connection to the database was successful.")
@@ -22,8 +22,8 @@ def create_connection():
 #         db = pymysql.connect(
 #             host="localhost",       # or your host name/IP address
 #             user="root",          # your MySQL username
-#             password="1234",
-#             database="my_database_test"  # optional if you want to connect to specific db
+#             password="2004",
+#             database="my_databaset"  # optional if you want to connect to specific db
 #         )
 #         cursor = db.cursor()
 #         query = """
@@ -56,7 +56,7 @@ def create_connection():
 #         db = pymysql.connect(
 #             host="localhost",       # or your host name/IP address
 #             user="root",          # your MySQL username
-#             password="1234",
+#             password="2004",
 #             database="my_database_test"  # optional if you want to connect to specific db
 #         )
 #         cursor = db.cursor()
@@ -100,19 +100,17 @@ def creer_table_joueur():
         req_creation = """
         CREATE TABLE IF NOT EXISTS joueur (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            nom VARCHAR(100) NOT NULL,
-            prenom VARCHAR(100) NOT NULL,
-            categorie  ENUM('Junior', 'Senior') ,
+            nom_prenom VARCHAR(100) NOT NULL,
+            categorie  ENUM('Junior', 'Senior'),
             selection_nationale VARCHAR(50),
-            poste_principal ENUM('Gardien', 'Défenseur', 'Milieu', 'Attaquant', 'Latéral', 'Pivot') NOT NULL DEFAULT 'Milieu',
-                    
+            poste_principal ENUM(
+                'Gardien', 'Arrière droit', 'Défenseur central droit', 'Défenseur central gauche', 'Arrière gauche',
+                'Milieu défensif', 'Milieu central', 'Milieu offensif', 'Ailier droit', 'Ailier gauche', 'Attaquant', 'Milieu'
+            ) NOT NULL DEFAULT 'Milieu',
             pied_fort ENUM('Droit', 'Gauche', 'Ambidextre'),
             taille INT,
             poids DECIMAL(5,2),
             date_naissance DATE,
-            
-
-            -- Statistiques
             matchs_joues INT DEFAULT 0,
             titulaire INT DEFAULT 0,
             remplacant INT DEFAULT 0,
@@ -121,27 +119,13 @@ def creer_table_joueur():
             assists INT DEFAULT 0,
             carton_jaune INT DEFAULT 0,
             carton_rouge INT DEFAULT 0,
-            
-            
-             -- Gestion des blessures
             est_blesse BOOLEAN DEFAULT FALSE,
-            type_blessure ENUM(
-                'Musculaire', 
-                'Articulaire', 
-                'Fracture', 
-                'Ligamentaire', 
-                'Tendinite', 
-                'Commotion', 
-                'Autre'
-            ),
+            type_blessure ENUM('Musculaire', 'Articulaire', 'Fracture', 'Ligamentaire', 'Tendinite', 'Commotion', 'Autre'),
             date_blessure DATE,
             date_retour_prevue DATE,
             severite_blessure ENUM('Légère', 'Modérée', 'Grave', 'Très grave'),
             description_blessure TEXT,
-            
-            
-            -- Index
-            INDEX idx_nom_prenom (nom, prenom),
+            INDEX idx_nom_prenom (nom_prenom),
             INDEX idx_categorie (categorie),
             INDEX idx_poste (poste_principal),
             INDEX idx_blesse (est_blesse)
@@ -149,17 +133,13 @@ def creer_table_joueur():
         """
         cursor.execute(req_creation)
         print("Table 'joueur' créée avec succès!")
-
-        
     except pymysql.Error as err:
         print(f"Error: {err}")
-        
-    except Exception as e:
-        print(f"An error occurred: {e}")
     finally:
         if 'db' in locals():
             cursor.close()
             db.close()
+
                   
 def creer_table_match():
     try:
@@ -213,6 +193,9 @@ def creer_table_match():
         if 'db' in locals():
             cursor.close()
             db.close()
+
+
+
 
 def creer_table_evaluation_technique(): 
     try:
@@ -342,6 +325,8 @@ def creer_table_evaluation_comportementale():
         if 'db' in locals():
             cursor.close()
             db.close()
+
+
 
 def creer_table_test_athletique():  
     try:
@@ -670,12 +655,6 @@ def creer_table_evaluation_sur_match():
         if 'db' in locals():
             cursor.close()
             db.close()
-    
-
-
-
-
-
 
 
 
@@ -687,28 +666,28 @@ def inserer_15_joueurs():
         cursor = db.cursor()
 
         joueurs = [
-            ("Dupont", "Jean", "Senior", "France", "Milieu", "Droit", 180, 75.5, "1990-05-15", 50, 40, 10, 3600, 15, 10, 2, 0, False, None, None, None, None, None),
-            ("Martin", "Paul", "Junior", "France", "Défenseur", "Gauche", 185, 80.0, "2002-03-10", 30, 25, 5, 2700, 5, 3, 1, 0, False, None, None, None, None, None),
-            ("Durand", "Luc", "Senior", "France", "Attaquant", "Droit", 175, 70.0, "1995-07-20", 60, 50, 10, 4000, 25, 12, 3, 1, False, None, None, None, None, None),
-            ("Petit", "Marie", "Junior", "France", "Gardien", "Ambidextre", 190, 85.0, "2004-11-05", 20, 18, 2, 1800, 0, 0, 0, 0, False, None, None, None, None, None),
-            ("Bernard", "Sophie", "Senior", "France", "Latéral", "Gauche", 165, 60.0, "1992-02-25", 40, 35, 5, 3200, 8, 6, 2, 0, False, None, None, None, None, None),
-            ("Morel", "Julien", "Junior", "France", "Pivot", "Droit", 195, 90.0, "2003-06-15", 25, 20, 5, 2000, 10, 8, 1, 0, False, None, None, None, None, None),
-            ("Simon", "Claire", "Senior", "France", "Milieu", "Gauche", 170, 65.0, "1991-09-30", 55, 45, 10, 3500, 12, 9, 3, 1, False, None, None, None, None, None),
-            ("Lemoine", "Hugo", "Junior", "France", "Défenseur", "Droit", 180, 75.0, "2005-01-12", 15, 12, 3, 1200, 3, 2, 0, 0, False, None, None, None, None, None),
-            ("Roux", "Emma", "Senior", "France", "Attaquant", "Ambidextre", 175, 68.0, "1993-04-18", 65, 55, 10, 4200, 30, 15, 4, 1, False, None, None, None, None, None),
-            ("Blanc", "Lucas", "Junior", "France", "Gardien", "Droit", 185, 82.0, "2001-08-22", 18, 15, 3, 1500, 0, 0, 0, 0, False, None, None, None, None, None),
-            ("Fontaine", "Alice", "Senior", "France", "Latéral", "Gauche", 160, 55.0, "1994-12-10", 45, 40, 5, 3000, 6, 4, 1, 0, False, None, None, None, None, None),
-            ("Chevalier", "Thomas", "Junior", "France", "Pivot", "Droit", 200, 95.0, "2006-03-05", 10, 8, 2, 800, 5, 3, 0, 0, False, None, None, None, None, None),
-            ("Garnier", "Julie", "Senior", "France", "Milieu", "Gauche", 175, 62.0, "1997-05-25", 50, 45, 5, 3600, 18, 12, 2, 0, False, None, None, None, None, None),
-            ("Lambert", "Antoine", "Junior", "France", "Défenseur", "Droit", 180, 78.0, "2000-10-10", 35, 30, 5, 2500, 7, 5, 1, 0, False, None, None, None, None, None),
-            ("Girard", "Camille", "Senior", "France", "Attaquant", "Ambidextre", 170, 63.0, "1996-07-07", 70, 60, 10, 4500, 35, 20, 5, 2, False, None, None, None, None, None)
+            ("Dupont Jean", "Senior", "France", "Milieu", "Droit", 180, 75.5, "1990-05-15", 50, 40, 10, 3600, 15, 10, 2, 0, False, None, None, None, None, None),
+            ("Martin Paul", "Junior", "France", "Défenseur central droit", "Gauche", 185, 80.0, "2002-03-10", 30, 25, 5, 2700, 5, 3, 1, 0, False, None, None, None, None, None),
+            ("Durand Luc", "Senior", "France", "Attaquant", "Droit", 175, 70.0, "1995-07-20", 60, 50, 10, 4000, 25, 12, 3, 1, False, None, None, None, None, None),
+            ("Petit Marie", "Junior", "France", "Gardien", "Ambidextre", 190, 85.0, "2004-11-05", 20, 18, 2, 1800, 0, 0, 0, 0, False, None, None, None, None, None),
+            ("Bernard Sophie", "Senior", "France", "Arrière gauche", "Gauche", 165, 60.0, "1992-02-25", 40, 35, 5, 3200, 8, 6, 2, 0, False, None, None, None, None, None),
+            ("Morel Julien", "Junior", "France", "Milieu offensif", "Droit", 195, 90.0, "2003-06-15", 25, 20, 5, 2000, 10, 8, 1, 0, False, None, None, None, None, None),
+            ("Simon Claire", "Senior", "France", "Milieu", "Gauche", 170, 65.0, "1991-09-30", 55, 45, 10, 3500, 12, 9, 3, 1, False, None, None, None, None, None),
+            ("Lemoine Hugo", "Junior", "France", "Défenseur central gauche", "Droit", 180, 75.0, "2005-01-12", 15, 12, 3, 1200, 3, 2, 0, 0, False, None, None, None, None, None),
+            ("Roux Emma", "Senior", "France", "Attaquant", "Ambidextre", 175, 68.0, "1993-04-18", 65, 55, 10, 4200, 30, 15, 4, 1, False, None, None, None, None, None),
+            ("Blanc Lucas", "Junior", "France", "Gardien", "Droit", 185, 82.0, "2001-08-22", 18, 15, 3, 1500, 0, 0, 0, 0, False, None, None, None, None, None),
+            ("Fontaine Alice", "Senior", "France", "Arrière droit", "Gauche", 160, 55.0, "1994-12-10", 45, 40, 5, 3000, 6, 4, 1, 0, False, None, None, None, None, None),
+            ("Chevalier Thomas", "Junior", "France", "Milieu offensif", "Droit", 200, 95.0, "2006-03-05", 10, 8, 2, 800, 5, 3, 0, 0, False, None, None, None, None, None),
+            ("Garnier Julie", "Senior", "France", "Milieu", "Gauche", 175, 62.0, "1997-05-25", 50, 45, 5, 3600, 18, 12, 2, 0, False, None, None, None, None, None),
+            ("Lambert Antoine", "Junior", "France", "Défenseur central droit", "Droit", 180, 78.0, "2000-10-10", 35, 30, 5, 2500, 7, 5, 1, 0, False, None, None, None, None, None),
+            ("Girard Camille", "Senior", "France", "Attaquant", "Ambidextre", 170, 63.0, "1996-07-07", 70, 60, 10, 4500, 35, 20, 5, 2, False, None, None, None, None, None)
         ]
 
         query = """
-        INSERT INTO joueur (nom, prenom, categorie, selection_nationale, poste_principal, pied_fort, taille, poids, date_naissance,
+        INSERT INTO joueur (nom_prenom, categorie, selection_nationale, poste_principal, pied_fort, taille, poids, date_naissance,
         matchs_joues, titulaire, remplacant, tempsjeu, buts, assists, carton_jaune, carton_rouge, est_blesse, type_blessure,
         date_blessure, date_retour_prevue, severite_blessure, description_blessure)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """
 
         cursor.executemany(query, joueurs)
@@ -720,6 +699,8 @@ def inserer_15_joueurs():
         if 'db' in locals():
             cursor.close()
             db.close()
+
+
             
 def inserer_sur_periodes_evaluations_pour_joueurs():
     try:
@@ -881,6 +862,13 @@ def inserer_evaluation_sur_periode_pour_joueur_7():
         periode = "Période 1"
         evaluation_date = "2025-06-04"
 
+        # Vérifier si le joueur existe
+        cursor.execute("SELECT id FROM joueur WHERE id = %s", (joueur_id,))
+        result = cursor.fetchone()
+        if result is None:
+            print(f"Le joueur avec ID {joueur_id} n'existe pas. Insertion annulée.")
+            return
+
         # Insert technical evaluation
         query_technique = """
         INSERT INTO evaluation_technique (id_joueur, evaluation_date, qualite_premiere_touche, qualite_passes, technique_defensive, sens_tactique_vision, vitesse_pensee, anticipation, adaptation_adversaire, sens_replacement, sens_demarquage, sens_marquage, technique_generale, jeu_tete, puissance_frappe, drible_feinte, technique_au_poste, puissance_physique, rapidite, moyenne_technique)
@@ -946,9 +934,87 @@ def inserer_evaluation_sur_periode_pour_joueur_7():
         cursor.execute(query_evaluation_periode, (joueur_id, periode, evaluation_date, id_technique, id_tactique, id_comportementale, id_athletique, id_morphologique, id_medical, id_nutritionnel, moyenne_generale))
 
         db.commit()
-        print("Évaluation sur période insérée avec succès pour le joueur d'ID 7!")
+        print("✅ Évaluation sur période insérée avec succès pour le joueur d'ID 7!")
+
     except pymysql.Error as err:
-        print(f"Erreur lors de l'insertion de l'évaluation sur période: {err}")
+        print(f"❌ Erreur lors de l'insertion de l'évaluation sur période: {err}")
+
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+
+
+from datetime import datetime, timedelta
+import random
+
+
+def inserer_matchs_aleatoires(nombre=10):
+    equipes = ["EST", "CA", "ESS", "CSS", "USMO", "CAB", "ASG", "USBG", "SG", "JSK"]
+    types_match = ['Amical', 'Championnat', 'Coupe', 'Tournoi']
+    conditions_meteo = ['Bon', 'Pluie', 'Vent', 'Neige', 'Chaleur', 'Brouillard']
+    saisons = ['2023/2024', '2024/2025']
+
+    try:
+        db = create_connection()
+        cursor = db.cursor()
+
+        for _ in range(nombre):
+            date_match = datetime.now() - timedelta(days=random.randint(0, 365))
+            lieu = random.choice(["Stade Olympique de Radès", "Stade Chedly Zouiten", "Stade Mustapha Ben Jannet"])
+            adversaire = random.choice(equipes)
+            type_match = random.choice(types_match)
+            domicile = random.choice([True, False])
+            score_equipe = random.randint(0, 5)
+            score_adversaire = random.randint(0, 5)
+            competion = random.choice(["Ligue 1", "Coupe de Tunisie", "Tournoi Printemps"])
+            saison = random.choice(saisons)
+            temps_reglementaire = 90
+            prolongation = random.choice([True, False])
+            penalties = random.choice([True, False])
+            condition_meteo = random.choice(conditions_meteo)
+            temperature = random.randint(10, 40)
+            public = random.randint(100, 50000)
+            arbitre_principal = random.choice(["Karim H.", "Sami M.", "Fethi B."])
+            arbitre_assistant_1 = random.choice(["Ali S.", "Tahar G.", "Nidhal K."])
+            arbitre_assistant_2 = random.choice(["Yassine B.", "Hichem C.", "Omar R."])
+            commentaires = random.choice([
+                "Match sans incidents.",
+                "But exceptionnel à la 90e.",
+                "Interruption de 10 minutes pour incident.",
+                "Carton rouge direct à la 65e."
+            ])
+
+            req_insert = """
+            INSERT INTO matchs (
+                date_match, lieu, adversaire, type_match, domicile,
+                score_equipe, score_adversaire, competion, saison,
+                temps_reglementaire, prolongation, penalties, conditions_meteo,
+                temperature, public, arbitre_principal, arbitre_assistant_1,
+                arbitre_assistant_2, commentaires
+            ) VALUES (
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s
+            );
+            """
+
+            cursor.execute(req_insert, (
+                date_match, lieu, adversaire, type_match, domicile,
+                score_equipe, score_adversaire, competion, saison,
+                temps_reglementaire, prolongation, penalties, condition_meteo,
+                temperature, public, arbitre_principal, arbitre_assistant_1,
+                arbitre_assistant_2, commentaires
+            ))
+
+        db.commit()
+        print(f"{nombre} matchs insérés avec succès !")
+
+    except pymysql.Error as err:
+        print(f"Erreur: {err}")
+
     finally:
         if 'db' in locals():
             cursor.close()
@@ -957,8 +1023,7 @@ def inserer_evaluation_sur_periode_pour_joueur_7():
 
 
 
-
-create_connection()
+# create_connection()
 
 # creer_table_joueur()
 # creer_table_match()
@@ -977,4 +1042,10 @@ create_connection()
 # inserer_15_joueurs()
 # inserer_sur_periodes_evaluations_pour_joueurs()
 # inserer_evaluations_par_match_pour_joueurs()
-inserer_evaluation_sur_periode_pour_joueur_7()
+# inserer_evaluation_sur_periode_pour_joueur_7()
+
+
+# inserer_matchs_aleatoires(20)
+
+
+    

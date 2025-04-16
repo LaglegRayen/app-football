@@ -1,6 +1,7 @@
 import pymysql
 from components import utils
 from database import db_connection
+import streamlit as st
 
 def supprimer_joueur(joueur_id):
     try:
@@ -263,16 +264,16 @@ def ajouter_evaluation_sur_periode(id_joueur, periode, evaluation_date, id_evalu
         return id if id else None
             
 def ajouter_evaluation_sur_match(id_joueur, id_match, id_evaluation_technique,
-    id_evaluation_tactique, id_evaluation_comportementale,videopath):
+    id_evaluation_tactique, id_evaluation_comportementale):
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
         query = """
         INSERT INTO evaluation_sur_match (id_joueur, id_match, id_evaluation_technique,
-        id_evaluation_tactique, id_evaluation_comportementale, videopath) VALUES (%s,%s,%s,%s,%s,%s);
+        id_evaluation_tactique, id_evaluation_comportementale) VALUES (%s,%s,%s,%s,%s);
         """
         cursor.execute(query, (id_joueur, id_match, id_evaluation_technique,
-        id_evaluation_tactique, id_evaluation_comportementale, videopath))
+        id_evaluation_tactique, id_evaluation_comportementale))
         db.commit()
         id = cursor.lastrowid
         print("Évaluation ajoutée avec succès!")
@@ -282,7 +283,10 @@ def ajouter_evaluation_sur_match(id_joueur, id_match, id_evaluation_technique,
         if 'db' in locals():
             cursor.close()
             db.close()
-    return id if id else None          
+    return id if id else None        
+
+
+
             
 def ajouter_match(date_match, lieu, adversaire, type_match, domicile, score_equipe, score_adversaire, saison):
     try:
@@ -349,7 +353,7 @@ def recuperer_informations_joueur(joueur_id):
         db = db_connection.create_connection()
         cursor = db.cursor()
         query = """
-        SELECT nom_prenom, categorie, nationalities,
+        SELECT nom_prenom, categorie, selection_nationale,
         poste_principal, pied_fort, taille, poids, date_naissance,
         matchs_joues, titulaire, remplacant, tempsjeu,
         buts, assists, carton_jaune, carton_rouge,
@@ -965,7 +969,7 @@ def recuperer_dates(Match):
 def recuperer_id_match(Match,date_match):
     result = None
     try:
-        db =db_connection.create_connection()
+        db = db_connection.create_connection()
         cursor = db.cursor()
         query = """
         SELECT id FROM matchs WHERE adversaire = %s AND date_match = %s;"""
@@ -1039,3 +1043,213 @@ def recuperer_joueurs(categorie):
         if 'db' in locals():
             cursor.close()
             db.close()
+
+
+
+def recuperer_id_evaluation_periode(joueur_id,periode_evaluation):
+    pass
+
+
+def recuperer_evaluation_par_match(joueur_id, id_match, id_table, choix):
+    result = None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = f"SELECT {id_table} FROM {choix} WHERE id_joueur = %s AND id_match = %s"
+        cursor.execute(query, (joueur_id, id_match))
+        result = cursor.fetchone()
+        if not result:
+            print("No evaluation found for this match.")
+        else:
+            return result[0]  # ✅ return the actual id value
+            
+    except pymysql.Error as e:
+        print(f"Error while fetching evaluation by match: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+
+
+    
+def recuperer_table(id, table):
+    result = None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor(pymysql.cursors.DictCursor)  # This allows fetching rows as dictionaries
+        query = f"SELECT * FROM {table} WHERE id = %s;"
+        cursor.execute(query, (id,))
+        result = cursor.fetchone()  # This now returns a dictionary
+        
+        if not result:
+            print("Aucune évaluation trouvée avec cet ID.")
+        
+        return result
+        
+    except pymysql.Error as e:
+        print(f"Erreur lors de la récupération de la table: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+
+
+
+
+def modifier_eval_par_match_technique(id, table, data, qualite_premiere_touche, qualite_passes, technique_defensive, sens_tactique_vision, vitesse_pensee,
+                            anticipation, adaptation_adversaire, sens_replacement, sens_demarquage, sens_marquage,
+                            technique_generale, jeu_tete, puissance_frappe, drible_feinte,
+                            technique_au_poste, puissance_physique, rapidite):
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = f"""
+        UPDATE {table}
+        SET qualite_premiere_touche = %s,
+            qualite_passes = %s,
+            technique_defensive = %s,
+            sens_tactique_vision = %s,
+            vitesse_pensee = %s,
+            anticipation = %s,
+            adaptation_adversaire = %s,
+            sens_replacement = %s,
+            sens_demarquage = %s,
+            sens_marquage = %s,
+            technique_generale = %s,
+            jeu_tete = %s,
+            puissance_frappe = %s,
+            drible_feinte = %s,
+            technique_au_poste = %s,
+            puissance_physique = %s,
+            rapidite = %s
+        WHERE id = %s;
+        """
+
+        cursor.execute(query, (
+            qualite_premiere_touche,
+            qualite_passes,
+            technique_defensive,
+            sens_tactique_vision,
+            vitesse_pensee,
+            anticipation,
+            adaptation_adversaire,
+            sens_replacement,
+            sens_demarquage,
+            sens_marquage,
+            technique_generale,
+            jeu_tete,
+            puissance_frappe,
+            drible_feinte,
+            technique_au_poste,
+            puissance_physique,
+            rapidite,
+            id
+        ))
+        db.commit()
+        st.success("Évaluation technique mise à jour avec succès!")
+
+    except pymysql.Error as err:
+        st.error(f"Erreur lors de la mise à jour de l'évaluation technique: {err}")
+
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+
+
+
+def modifier_eval_par_match_tactique(id, table, data, intelligence_de_jeu, disponibilite, jouer_vers_avant, jouer_dos_adversaires, changer_rythme):
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = f"""
+        UPDATE {table}
+        SET intelligence_de_jeu = %s,
+            disponibilite = %s,
+            jouer_vers_avant = %s,
+            jouer_dos_adversaires = %s,
+            changer_rythme = %s
+        WHERE id = %s;
+        """
+        cursor.execute(query, (
+            intelligence_de_jeu,
+            disponibilite,
+            jouer_vers_avant,
+            jouer_dos_adversaires,
+            changer_rythme,
+            id
+        ))
+        db.commit()
+        st.success("Évaluation tactique mise à jour avec succès!")
+
+    except pymysql.Error as err:
+        st.error(f"Erreur lors de la mise à jour de l'évaluation tactique: {err}")
+
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+
+
+
+def modifier_eval_par_match_comportementale(id, table, data, assiduite, motivation_volonte, confiance_prise_risque, calme_maitrise_soi, combativite, sportivite, amabilite):
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = f"""
+        UPDATE {table}
+        SET assiduite = %s,
+            motivation_volonte = %s,
+            confiance_prise_risque = %s,
+            calme_maitrise_soi = %s,
+            combativite = %s,
+            sportivite = %s,
+            amabilite = %s
+        WHERE id = %s;
+        """
+
+        cursor.execute(query, (
+            assiduite,
+            motivation_volonte,
+            confiance_prise_risque,
+            calme_maitrise_soi,
+            combativite,
+            sportivite,
+            amabilite,
+            id
+        ))
+        db.commit()
+        st.success("Évaluation comportementale mise à jour avec succès!")
+
+    except pymysql.Error as err:
+        st.error(f"Erreur lors de la mise à jour de l'évaluation comportementale: {err}")
+
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+
+
+
+
+def recuperer_evaluation_par_periode(joueur_id, periode_evaluation, id_table, choix):
+    result = None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = f"SELECT {id_table} FROM {choix} WHERE id_joueur = %s AND periode_test = %s"
+        cursor.execute(query, (joueur_id, periode_evaluation))
+        result = cursor.fetchone()
+        if not result:
+            print("No evaluation found for this match.")
+        else:
+            return result[0]  # ✅ return the actual id value
+            
+    except pymysql.Error as e:
+        print(f"Error while fetching evaluation by match: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+
+

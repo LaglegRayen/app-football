@@ -41,7 +41,7 @@ def ajouter_evaluation_sur_periode():
 
     with col1:
 
-        qualite_premiere_touche = st.number_input("Qualité de la Première Touche (intention, enchainer vers l'avant)", 0, 5)
+        qualite_premiere_touche = st.number_input("Qualité de la Première Touche", 0, 5)
         sens_tactique_vision = st.number_input("Sens Tactique et Vision", 0, 5)
         adaptation_adversaire = st.number_input("Adaptation à l'Adversaire", 0, 5)
         sens_marquage = st.number_input("Sens du Marquage", 0, 5)
@@ -235,10 +235,7 @@ def ajouter_evaluation_sur_periode():
         # )
         
         
-        # st.success("Évaluation ajoutée avec succès!") 
-
-
-
+        # st.success("Évaluation ajoutée avec succès!")
 
 
 
@@ -254,12 +251,8 @@ def ajouter_evaluation_sur_match():
         nom_prenom = st.selectbox("Nom et Prénom du Joueur", list(nom_prenom_list), key = "nom_prenom_evaluation_match")
         if nom_prenom:
             joueur_id = queries.recuperer_id_joueur(nom_prenom)
-            if joueur_id:
-                st.success(f"ID du joueur trouvé: {joueur_id}")
-            else:
-                st.warning("Aucun joueur trouvé avec ce nom et prénom.")
-    else:
-        st.warning("Aucun joueur trouvé pour cette catégorie.")
+
+
     Match = st.text_input("Match")
     Match = Match.upper()
     date_match = None
@@ -269,12 +262,7 @@ def ajouter_evaluation_sur_match():
         date_match = st.selectbox("Date du Match", date_list)
         id_match = queries.recuperer_id_match(Match,date_match)
 
-        if id_match:
-            st.success(f"ID du match trouvé: {id_match}")
-        else:
-            st.warning("Aucun match trouvé avec ce nom et cette date.")
-        print("hello")
-    
+
     if date_match:
         with st.form("form_evaluation_sur_match"):
             # Evaluation technique
@@ -367,30 +355,280 @@ def ajouter_evaluation_sur_match():
                 id_evaluation_comportementale = queries.ajouter_evaluation_comportementale(joueur_id, date_match, 
                     assiduite, motivation_volonte, confiance_prise_risque,    
                     calme_maitrise_soi, combativite, sportivite, amabilite)
+                
+
                 queries.ajouter_evaluation_sur_match(
                     joueur_id,
                     id_match,
                     id_evaluation_technique,
                     id_evaluation_tactique,
-                    id_evaluation_comportementale,
-                    f"evaluations-matchs-vids/evaluation-{nom_prenom}-{Match}-{date_match}.mp4")
+                    id_evaluation_comportementale)
+                
+                
+                # f"evaluations-matchs-vids/evaluation-{nom_prenom}-{Match}-{date_match}.mp4"
 
                 st.success("Évaluation ajoutée avec succès!")
 
 
 
 
+
+
+
+def modification_suppression_evaluation():
+    st.header("Informations du joueur")
+    nom_prenom = st.text_input("Nom et prénom du joueur", key = "nom_prenom_modif")
+    joueur_id = None
+
+    if nom_prenom:
+        joueur_id = queries.recuperer_id_joueur(nom_prenom)
+        if not joueur_id:
+            st.warning("Aucun joueur trouvé avec ce nom et prénom.")
+            
+        choose = st.selectbox("choose the type of evaluation", ["Évaluation par Periode", "Évaluation par Match"], key="choix_evaluation")
+
+        if choose == "Évaluation par Match":
+            choix = "evaluation_sur_match"
+            Match = st.text_input("Match", key="Match")
+            Match = Match.upper()
+            date_match = None
+        
+            if Match:
+                date_list = [Date for Date in queries.recuperer_dates(Match)]
+                date_match = st.selectbox("Date du Match", date_list, key="Date du Match")
+                id_match = queries.recuperer_id_match(Match, date_match)
+
+                if not id_match:
+                    st.warning("Aucun match trouvé avec ce nom et cette date.")
+                
+                choose_eval = st.selectbox("choose the evaluation", ["1️⃣ Évaluation Technique", "2️⃣ Évaluation Tactique", "3️⃣ Évaluation Comportementale"])
+
+                if choose_eval == "1️⃣ Évaluation Technique":
+                    table = "evaluation_technique"
+                    id_table = "id_evaluation_technique"
+                    id_match = queries.recuperer_id_match(Match, date_match)
+                    id = queries.recuperer_evaluation_par_match(joueur_id, id_match, id_table, choix)
+                    data = queries.recuperer_table(id, table)
+
+                    if data is not None:  # Check if data is not None before using it
+                        st.subheader("1️⃣ Évaluation Technique")
+                        col1, col2, col3 = st.columns(3)
+
+                        with col1:
+                            qualite_premiere_touche = st.number_input("Qualité de la Première Touche", 0, 5, value=data["qualite_premiere_touche"], key="tech_qualite_premiere_touche")
+                            sens_tactique_vision = st.number_input("Sens Tactique et Vision", 0, 5, value=data["sens_tactique_vision"], key="tech_sens_tactique_vision")
+                            adaptation_adversaire = st.number_input("Adaptation à l'Adversaire", 0, 5, value=data["adaptation_adversaire"], key="tech_adaptation_adversaire")
+                            sens_marquage = st.number_input("Sens du Marquage", 0, 5, value=data["sens_marquage"], key="tech_sens_marquage")
+                            puissance_frappe = st.number_input("Puissance de Frappe", 0, 5, value=data["puissance_frappe"], key="tech_puissance_frappe")
+                            puissance_physique = st.number_input("Puissance Physique", 0, 5, value=data["puissance_physique"], key="tech_puissance_physique")
+
+                        with col2:
+                            qualite_passes = st.number_input("Qualité des Passes", 0, 5, value=data["qualite_passes"], key="tech_qualite_passes")
+                            vitesse_pensee = st.number_input("Vitesse de Pensée", 0, 5, value=data["vitesse_pensee"], key="tech_vitesse_pensee")
+                            sens_replacement = st.number_input("Sens du Replacement", 0, 5, value=data["sens_replacement"], key="tech_sens_replacement")
+                            technique_generale = st.number_input("Technique Générale", 0, 5, value=data["technique_generale"], key="tech_technique_generale")
+                            drible_feinte = st.number_input("Dribble et Feinte", 0, 5, value=data["drible_feinte"], key="tech_drible_feinte")
+                            rapidite = st.number_input("Rapidité", 0, 5, value=data["rapidite"], key="tech_rapidite")
+
+                        with col3:
+                            technique_defensive = st.number_input("Technique Défensive", 0, 5, value=data["technique_defensive"], key="tech_technique_defensive")
+                            anticipation = st.number_input("Anticipation", 0, 5, value=data["anticipation"], key="tech_anticipation")
+                            sens_demarquage = st.number_input("Sens du Démarquage", 0, 5, value=data["sens_demarquage"], key="tech_sens_demarquage")
+                            jeu_tete = st.number_input("Jeu de Tête", 0, 5, value=data["jeu_tete"], key="tech_jeu_tete")
+                            technique_au_poste = st.number_input("Technique au Poste", 0, 5, value=data["technique_au_poste"], key="tech_technique_au_poste")
+                    else:
+                        st.warning("Aucune évaluation trouvée pour ce joueur et ce match.")
+
+
+                elif choose_eval == "2️⃣ Évaluation Tactique":
+                    table = "evaluation_tactique"
+                    id_table = "id_evaluation_tactique"
+                    id_match = queries.recuperer_id_match(Match, date_match)
+                    id = queries.recuperer_evaluation_par_match(joueur_id, id_match, id_table, choix)
+                    data = queries.recuperer_table(id, table)
+
+                    if data is not None:  # Check if data is not None before using it
+                        st.subheader("2️⃣ Évaluation Tactique")
+                        col1, col2, col3 = st.columns(3)
+
+                        with col1:
+                            intelligence_de_jeu = st.number_input("Intelligence de Jeu", 0, 5, value=data["intelligence_de_jeu"], key="tactique_intelligence_de_jeu")
+                            jouer_dos_adversaires = st.number_input("Jouer Dos aux Adversaires", 0, 5, value=data["jouer_dos_adversaires"], key="tactique_jouer_dos_adversaires")
+
+                        with col2:
+                            disponibilite = st.number_input("Disponibilité", 0, 5, value=data["disponibilite"], key="tactique_disponibilite")
+                            changer_rythme = st.number_input("Changer de Rythme", 0, 5, value=data["changer_rythme"], key="tactique_changer_rythme")
+
+                        with col3:
+                            jouer_vers_avant = st.number_input("Jouer vers l'Avant", 0, 5, value=data["jouer_vers_avant"], key="tactique_jouer_vers_avant")
+                    else:
+                        st.warning("Aucune évaluation trouvée pour ce joueur et ce match.")
+
+
+                elif choose_eval == "3️⃣ Évaluation Comportementale":
+                    table = "evaluation_comportementale"
+                    id_table = "id_evaluation_comportementale"
+                    id_match = queries.recuperer_id_match(Match, date_match)
+                    id = queries.recuperer_evaluation_par_match(joueur_id, id_match, id_table, choix)
+                    data = queries.recuperer_table(id, table)
+
+                    if data is not None:  # Check if data is not None before using it
+                        st.subheader("3️⃣ Évaluation Comportementale")
+                        col1, col2, col3 = st.columns(3)
+
+                        with col1:
+                            assiduite = st.number_input("Assiduité", 0, 5, value=data["assiduite"], key="comp_assiduite")
+                            calme_maitrise_soi = st.number_input("Calme et Maîtrise de Soi", 0, 5, value=data["calme_maitrise_soi"], key="comp_calme_maitrise_soi")
+                            amabilite = st.number_input("Amabilité", 0, 5, value=data["amabilite"], key="comp_amabilite")
+
+                        with col2:
+                            motivation_volonte = st.number_input("Motivation et Volonté", 0, 5, value=data["motivation_volonte"], key="comp_motivation_volonte")
+                            combativite = st.number_input("Combativité", 0, 5, value=data["combativite"], key="comp_combativite")
+
+                        with col3:
+                            confiance_prise_risque = st.number_input("Confiance et Prise de Risque", 0, 5, value=data["confiance_prise_risque"], key="comp_confiance_prise_risque")
+                            sportivite = st.number_input("Sportivité", 0, 5, value=data["sportivite"], key="comp_sportivite")
+                    else:
+                        st.warning("Aucune évaluation trouvée pour ce joueur et ce match.")
+
+
+                
+                if st.button("modifier"):
+                    if table == "evaluation_technique":
+                        queries.modifier_eval_par_match_technique(id, table, data, qualite_premiere_touche, qualite_passes, technique_defensive, sens_tactique_vision, vitesse_pensee,
+                            anticipation, adaptation_adversaire, sens_replacement, sens_demarquage, sens_marquage,
+                            technique_generale, jeu_tete, puissance_frappe, drible_feinte,
+                            technique_au_poste, puissance_physique, rapidite)
+
+                    elif table == "evaluation_tactique":
+                        queries.modifier_eval_par_match_tactique(id, table, data, intelligence_de_jeu, disponibilite, jouer_vers_avant, jouer_dos_adversaires, changer_rythme)
+
+                    elif table == "evaluation_comportementale":
+                        queries.modifier_eval_par_match_comportementale(id, table, data, assiduite, motivation_volonte, confiance_prise_risque, calme_maitrise_soi, combativite, sportivite, amabilite)
+
+        
+        
+        else:
+            periode_evaluation = st.selectbox("Période du Test", ["Période 1", "Période 2", "Période 3", "Période 4", "Période 5"], key="periode_evaluation")
+            choix = "evaluation_sur_periode"
+
+            if periode_evaluation:
+                choose_eval = st.selectbox("choose the evaluation", ["1️⃣ Évaluation Technique", "2️⃣ Évaluation Tactique", "3️⃣ Évaluation Comportementale", "4️⃣ Test Athlétique", "5️⃣ Test Morphologique", "6️⃣ Test Médical", "7️⃣ Suivi Nutritionnel"])
+                if choose_eval == "1️⃣ Évaluation Technique":
+                    table = "evaluation_technique"
+                    id_table = "id_evaluation_technique"
+                    id = queries.recuperer_evaluation_par_periode(joueur_id, periode_evaluation, id_table, choix)
+                    data = queries.recuperer_table(id, table)
+
+                    if data is not None:
+                        st.subheader("1️⃣ Évaluation Technique")
+                        col1, col2, col3 = st.columns(3)
+
+                        with col1:
+                            qualite_premiere_touche = st.number_input("Qualité de la Première Touche", 0, 5, value=data["qualite_premiere_touche"], key="tech_qualite_premiere_touche")
+                            sens_tactique_vision = st.number_input("Sens Tactique et Vision", 0, 5, value=data["sens_tactique_vision"], key="tech_sens_tactique_vision")
+                            adaptation_adversaire = st.number_input("Adaptation à l'Adversaire", 0, 5, value=data["adaptation_adversaire"], key="tech_adaptation_adversaire")
+                            sens_marquage = st.number_input("Sens du Marquage", 0, 5, value=data["sens_marquage"], key="tech_sens_marquage")
+                            puissance_frappe = st.number_input("Puissance de Frappe", 0, 5, value=data["puissance_frappe"], key="tech_puissance_frappe")
+                            puissance_physique = st.number_input("Puissance Physique", 0, 5, value=data["puissance_physique"], key="tech_puissance_physique")
+
+                        with col2:
+                            qualite_passes = st.number_input("Qualité des Passes", 0, 5, value=data["qualite_passes"], key="tech_qualite_passes")
+                            vitesse_pensee = st.number_input("Vitesse de Pensée", 0, 5, value=data["vitesse_pensee"], key="tech_vitesse_pensee")
+                            sens_replacement = st.number_input("Sens du Replacement", 0, 5, value=data["sens_replacement"], key="tech_sens_replacement")
+                            technique_generale = st.number_input("Technique Générale", 0, 5, value=data["technique_generale"], key="tech_technique_generale")
+                            drible_feinte = st.number_input("Dribble et Feinte", 0, 5, value=data["drible_feinte"], key="tech_drible_feinte")
+                            rapidite = st.number_input("Rapidité", 0, 5, value=data["rapidite"], key="tech_rapidite")
+
+                        with col3:
+                            technique_defensive = st.number_input("Technique Défensive", 0, 5, value=data["technique_defensive"], key="tech_technique_defensive")
+                            anticipation = st.number_input("Anticipation", 0, 5, value=data["anticipation"], key="tech_anticipation")
+                            sens_demarquage = st.number_input("Sens du Démarquage", 0, 5, value=data["sens_demarquage"], key="tech_sens_demarquage")
+                            jeu_tete = st.number_input("Jeu de Tête", 0, 5, value=data["jeu_tete"], key="tech_jeu_tete")
+                            technique_au_poste = st.number_input("Technique au Poste", 0, 5, value=data["technique_au_poste"], key="tech_technique_au_poste")
+                    else:
+                        st.warning("Aucune évaluation trouvée pour ce joueur et cette période.")
+                    
+
+                elif choose_eval == "2️⃣ Évaluation Tactique":
+                    table = "evaluation_tactique"
+                    id_table = "id_evaluation_tactique"
+                    id = queries.recuperer_evaluation_par_periode(joueur_id, periode_evaluation, id_table, choix)
+                    data = queries.recuperer_table(id, table)
+
+                    if data is not None:  # Check if data is not None before using it
+                        st.subheader("2️⃣ Évaluation Tactique")
+                        col1, col2, col3 = st.columns(3)
+
+                        with col1:
+                            intelligence_de_jeu = st.number_input("Intelligence de Jeu", 0, 5, value=data["intelligence_de_jeu"], key="tactique_intelligence_de_jeu")
+                            jouer_dos_adversaires = st.number_input("Jouer Dos aux Adversaires", 0, 5, value=data["jouer_dos_adversaires"], key="tactique_jouer_dos_adversaires")
+
+                        with col2:
+                            disponibilite = st.number_input("Disponibilité", 0, 5, value=data["disponibilite"], key="tactique_disponibilite")
+                            changer_rythme = st.number_input("Changer de Rythme", 0, 5, value=data["changer_rythme"], key="tactique_changer_rythme")
+
+                        with col3:
+                            jouer_vers_avant = st.number_input("Jouer vers l'Avant", 0, 5, value=data["jouer_vers_avant"], key="tactique_jouer_vers_avant")
+                    else:
+                        st.warning("Aucune évaluation trouvée pour ce joueur et ce match.")
+
+                
+                elif choose_eval == "3️⃣ Évaluation Comportementale":
+                    table = "evaluation_comportementale"
+                    id_table = "id_evaluation_comportementale"
+                    id = queries.recuperer_evaluation_par_periode(joueur_id, periode_evaluation, id_table, choix)
+                    data = queries.recuperer_table(id, table)
+
+                    if data is not None:  # Check if data is not None before using it
+                        st.subheader("3️⃣ Évaluation Comportementale")
+                        col1, col2, col3 = st.columns(3)
+
+                        with col1:
+                            assiduite = st.number_input("Assiduité", 0, 5, value=data["assiduite"], key="comp_assiduite")
+                            calme_maitrise_soi = st.number_input("Calme et Maîtrise de Soi", 0, 5, value=data["calme_maitrise_soi"], key="comp_calme_maitrise_soi")
+                            amabilite = st.number_input("Amabilité", 0, 5, value=data["amabilite"], key="comp_amabilite")
+
+                        with col2:
+                            motivation_volonte = st.number_input("Motivation et Volonté", 0, 5, value=data["motivation_volonte"], key="comp_motivation_volonte")
+                            combativite = st.number_input("Combativité", 0, 5, value=data["combativite"], key="comp_combativite")
+
+                        with col3:
+                            confiance_prise_risque = st.number_input("Confiance et Prise de Risque", 0, 5, value=data["confiance_prise_risque"], key="comp_confiance_prise_risque")
+                            sportivite = st.number_input("Sportivité", 0, 5, value=data["sportivite"], key="comp_sportivite")
+                    else:
+                        st.warning("Aucune évaluation trouvée pour ce joueur et ce match.")
+
+                
+                if st.button("modifier"):
+                    if table == "evaluation_technique":
+                        queries.modifier_eval_par_match_technique(id, table, data, qualite_premiere_touche, qualite_passes, technique_defensive, sens_tactique_vision, vitesse_pensee,
+                            anticipation, adaptation_adversaire, sens_replacement, sens_demarquage, sens_marquage,
+                            technique_generale, jeu_tete, puissance_frappe, drible_feinte,
+                            technique_au_poste, puissance_physique, rapidite)
+
+                    elif table == "evaluation_tactique":
+                        queries.modifier_eval_par_match_tactique(id, table, data, intelligence_de_jeu, disponibilite, jouer_vers_avant, jouer_dos_adversaires, changer_rythme)
+
+                    elif table == "evaluation_comportementale":
+                        queries.modifier_eval_par_match_comportementale(id, table, data, assiduite, motivation_volonte, confiance_prise_risque, calme_maitrise_soi, combativite, sportivite, amabilite)
+
+
+
+
+
 def creer_evaluation():
     st.title("Ajouter une Évaluation")
-    tab1,tab2 = st.tabs(["Évaluation par Periode","Évaluation par Match"])
+    tab1,tab2,tab3 = st.tabs(["Évaluation par Periode","Évaluation par Match","Modification et Suppression"])
     
     with tab1:
        ajouter_evaluation_sur_periode()
+
     with tab2:
         ajouter_evaluation_sur_match()
-        
 
-
+    with tab3:
+        modification_suppression_evaluation()
 
 
 if __name__ == "__main__":

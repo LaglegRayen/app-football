@@ -306,8 +306,9 @@ def afficher_statistiques_joueur():
                 afficher = st.button("Afficher la vidéo")
             
             if afficher:
-                
-                videopath = "evaluations-matchs-vids/evaluation-{}-{}-{}.mp4".format(nom_prenom,
+                evaluations_sur_match.iloc[numero_match-1]["Date"]
+
+                videopath = "app-football\evaluations-matchs-vids\evaluation-Dupont Jean-EST-2024-10-31.mp4".format(nom_prenom,
                     str(queries.recuperer_adversaire(nom_prenom,
                         evaluations_sur_match.iloc[numero_match]["Date"])),
                     str(evaluations_sur_match.iloc[numero_match-1]["Date"].date()))
@@ -436,22 +437,13 @@ def modification_suppression_joueur():
         
 
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+    
 
 def main():
     st.title("Gestion des joueurs")
     
     # Tabs for different functionalities
-    onglet = st.tabs(["Insertion d'un joueur", "statistiques joueur", "Comparer les joueurs", "modification et suppression"])
+    onglet = st.tabs(["Insertion d'un joueur", "statistiques joueur", "Comparer les joueurs", "Modification et Suppression"])
     
     with onglet[0]:
         inserer_joueur()
