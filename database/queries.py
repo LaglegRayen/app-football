@@ -39,13 +39,13 @@ def ajouter_evaluation_technique(id_joueur,evaluation_date, qualite_premiere_tou
     qualite_passes, technique_defensive, sens_tactique_vision, vitesse_pensee, 
     anticipation, adaptation_adversaire, sens_replacement, sens_demarquage, 
     sens_marquage, technique_generale, jeu_tete, puissance_frappe, drible_feinte, 
-    technique_au_poste, puissance_physique, rapidite):
+    technique_au_poste, puissance_physique, rapidite, moyenne_technique):
     id = None
     try:
         
         db =db_connection.create_connection()
         cursor = db.cursor()
-        moy = (qualite_premiere_touche + qualite_passes + technique_defensive + sens_tactique_vision + vitesse_pensee + anticipation + adaptation_adversaire + sens_replacement + sens_demarquage + sens_marquage + technique_generale + jeu_tete + puissance_frappe + drible_feinte + technique_au_poste + puissance_physique + rapidite) / 17
+
         query = """
         INSERT INTO evaluation_technique (id_joueur,evaluation_date, qualite_premiere_touche, 
         qualite_passes, technique_defensive, sens_tactique_vision, vitesse_pensee,
@@ -54,11 +54,12 @@ def ajouter_evaluation_technique(id_joueur,evaluation_date, qualite_premiere_tou
         technique_au_poste, puissance_physique, rapidite,moyenne_technique)
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
         """
+        
         cursor.execute(query, (id_joueur,evaluation_date, qualite_premiere_touche,
         qualite_passes, technique_defensive, sens_tactique_vision, vitesse_pensee,
         anticipation, adaptation_adversaire, sens_replacement, sens_demarquage,
         sens_marquage,technique_generale, jeu_tete, puissance_frappe, drible_feinte,
-        technique_au_poste, puissance_physique, rapidite,moy))
+        technique_au_poste, puissance_physique, rapidite,moyenne_technique))
         db.commit()
         id = cursor.lastrowid
         print("Évaluation technique ajoutée avec succès!")
@@ -71,23 +72,22 @@ def ajouter_evaluation_technique(id_joueur,evaluation_date, qualite_premiere_tou
         if 'db' in locals():
             cursor.close()
             db.close()
-    
-  
+ 
 def ajouter_evaluation_tactique(id_joueur, evaluation_date, 
     intelligence_de_jeu, disponibilite, jouer_vers_avant,
-    jouer_dos_adversaires, changer_rythme):
+    jouer_dos_adversaires, changer_rythme, moyenne_tactique):
     id = None
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
-        moy = (intelligence_de_jeu + disponibilite + jouer_vers_avant + jouer_dos_adversaires + changer_rythme) / 5
+        
         query = """
         INSERT INTO evaluation_tactique (id_joueur, evaluation_date, intelligence_de_jeu, disponibilite, jouer_vers_avant,
         jouer_dos_adversaires, changer_rythme, moyenne_tactique)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
         """
         cursor.execute(query, (id_joueur, evaluation_date, intelligence_de_jeu, disponibilite, jouer_vers_avant,
-        jouer_dos_adversaires, changer_rythme, moy))
+        jouer_dos_adversaires, changer_rythme,moyenne_tactique))
         db.commit()
         
         id = cursor.lastrowid
@@ -102,19 +102,19 @@ def ajouter_evaluation_tactique(id_joueur, evaluation_date,
         
 def ajouter_evaluation_comportementale(id_joueur, evaluation_date, assiduite, 
     motivation_volonte, confiance_prise_risque, calme_maitrise_soi, combativite,
-    sportivite, amabilite):
+    sportivite, amabilite, moyenne_comportementale):
     id = None
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
-        moy = (assiduite + motivation_volonte + confiance_prise_risque + calme_maitrise_soi + combativite + sportivite + amabilite) / 7
+        
         query = """
         INSERT INTO evaluation_comportementale (id_joueur, evaluation_date, assiduite, motivation_volonte, confiance_prise_risque,
         calme_maitrise_soi, combativite, sportivite, amabilite, moyenne_comportementale)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """
         cursor.execute(query, (id_joueur, evaluation_date, assiduite, motivation_volonte, confiance_prise_risque,
-        calme_maitrise_soi, combativite, sportivite, amabilite, moy))
+        calme_maitrise_soi, combativite, sportivite, amabilite, moyenne_comportementale))
         db.commit()
         id = cursor.lastrowid
         print("Évaluation comportementale ajoutée avec succès!")
@@ -155,6 +155,7 @@ def ajouter_test_athletique(id_joueur, categorie, date_test, periode_test,
 
 
 def ajouter_test_morphologique(id_joueur, date_test, periode_test, poids, taille, masse_grasse):
+    id = None
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
@@ -166,17 +167,18 @@ def ajouter_test_morphologique(id_joueur, date_test, periode_test, poids, taille
         db.commit()
         id = cursor.lastrowid
         print("Test morphologique ajouté avec succès!")
+        return id
     except pymysql.Error as e:
         print(f"Erreur lors de l'insertion du test morphologique: {e}")
     finally:
         if 'db' in locals():
             cursor.close()
             db.close()
-    return id if id else None
         
 def ajouter_test_medical(id_joueur, categorie, date_test, periode_test, taille, 
     poids, masse_grasse, examen_general, examen_orthopedique, examen_dentaire,
     examen_orl, examen_dermatologique, examen_psychologique, commentaires):
+    id = None
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
@@ -184,7 +186,7 @@ def ajouter_test_medical(id_joueur, categorie, date_test, periode_test, taille,
         INSERT INTO test_medical (id_joueur, categorie, date_test, periode_test, taille, poids, masse_grasse,
         examen_general, examen_orthopedique, examen_dentaire, examen_orl, examen_dermatologique,
         examen_psychologique, commentaires)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
         """
         cursor.execute(query, (id_joueur, categorie, date_test, periode_test, taille, poids, masse_grasse,
         examen_general, examen_orthopedique, examen_dentaire, examen_orl, examen_dermatologique,
@@ -192,19 +194,23 @@ def ajouter_test_medical(id_joueur, categorie, date_test, periode_test, taille,
         db.commit()
         id = cursor.lastrowid
         print("Test médical ajouté avec succès!")
+        
     except pymysql.Error as e:
         print(f"Erreur lors de l'insertion du test médical: {e}")
     finally:
         if 'db' in locals():
             cursor.close()
             db.close()
-    return id if id else None    
+    return id
+
+
     
 def ajouter_suivi_nutritionnel(id_joueur, groupe, date_creation, periode_test, 
     age, poids_depart, taille, objectif, details_objectif, regime_specifique, 
     date_premier_suivi, date_deuxieme_suivi, date_troisieme_suivi, eval_premier_suivi, 
     eval_deuxieme_suivi , eval_troisieme_suivi, poids_actuel, 
     satisfaction, commentaires):
+    id = None
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
@@ -221,69 +227,64 @@ def ajouter_suivi_nutritionnel(id_joueur, groupe, date_creation, periode_test,
         db.commit()
         id = cursor.lastrowid
         print("Suivi nutritionnel ajouté avec succès!")
+        return id
     except pymysql.Error as e:
         print(f"Erreur lors de l'insertion du suivi nutritionnel: {e}")
     finally:
         if 'db' in locals():
             cursor.close()
             db.close()
-    return id if id else None
+    return id 
+
 
 def ajouter_evaluation_sur_periode(id_joueur, periode, evaluation_date, id_evaluation_technique,
     id_evaluation_tactique, id_evaluation_comportementale, id_test_athletique, 
-    id_test_morphologique, id_test_medical, id_suivi_nutritionnel, id_suivi_psychologique,
-    id_test_physique):
-    
-        try:
-            db = pymysql.connect(
-            host="localhost",       # or your host name/IP address
-            user="root",          # your MySQL username
-            password="LAGLEG123",
-            database="my_database"  # optional if you want to connect to specific db
-            )
-            cursor = db.cursor()
-            query = """
-            INSERT INTO evaluation_generale_periode (id_joueur, periode, evaluation_date, id_evaluation_technique,
-            id_evaluation_tactique, id_evaluation_comportementale, id_test_athletique, 
-            id_test_morphologique, id_test_medical, id_suivi_nutritionnel, id_suivi_psychologique,
-            id_test_physique) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
-            """
-            cursor.execute(query, (id_joueur, periode, evaluation_date, id_evaluation_technique,
-            id_evaluation_tactique, id_evaluation_comportementale, id_test_athletique, 
-            id_test_morphologique, id_test_medical, id_suivi_nutritionnel, id_suivi_psychologique,
-            id_test_physique))
-            db.commit()
-            id = cursor.lastrowid
-            print("Évaluation ajoutée avec succès!")
-        except pymysql.Error as e:
-            print(f"Erreur lors de l'insertion de l'évaluation: {e}")
-        finally:
-            if 'db' in locals():
-                cursor.close()
-                db.close()
-        return id if id else None
+    id_test_morphologique, id_test_medical, id_suivi_nutritionnel, moyenne_sur_periode):
+    id = None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = """
+        INSERT INTO evaluation_sur_periode (id_joueur, periode, evaluation_date, id_evaluation_technique,
+        id_evaluation_tactique, id_evaluation_comportementale, id_test_athletique, 
+        id_test_morphologique, id_test_medical, id_suivi_nutritionnel, moyenne_generale) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+        """
+        cursor.execute(query, (id_joueur, periode, evaluation_date, id_evaluation_technique,
+        id_evaluation_tactique, id_evaluation_comportementale, id_test_athletique, 
+        id_test_morphologique, id_test_medical, id_suivi_nutritionnel, moyenne_sur_periode))
+        db.commit()
+        id = cursor.lastrowid
+        print("Évaluation ajoutée avec succès!")
+    except pymysql.Error as e:
+        print(f"Erreur lors de l'insertion de l'évaluation sur periode: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+    return id
             
 def ajouter_evaluation_sur_match(id_joueur, id_match, id_evaluation_technique,
-    id_evaluation_tactique, id_evaluation_comportementale):
+    id_evaluation_tactique, id_evaluation_comportementale, moyenne_evaluation_match, videopath):
+    id = None
     try:
         db =db_connection.create_connection()
         cursor = db.cursor()
         query = """
         INSERT INTO evaluation_sur_match (id_joueur, id_match, id_evaluation_technique,
-        id_evaluation_tactique, id_evaluation_comportementale) VALUES (%s,%s,%s,%s,%s);
+        id_evaluation_tactique, id_evaluation_comportementale,moyenne_generale,videopath) VALUES (%s,%s,%s,%s,%s,%s,%s);
         """
         cursor.execute(query, (id_joueur, id_match, id_evaluation_technique,
-        id_evaluation_tactique, id_evaluation_comportementale))
+        id_evaluation_tactique, id_evaluation_comportementale, moyenne_evaluation_match, videopath))
         db.commit()
         id = cursor.lastrowid
         print("Évaluation ajoutée avec succès!")
     except pymysql.Error as e:
-        print(f"Erreur lors de l'insertion de l'évaluation: {e}")
+        print(f"Erreur lors de l'insertion de l'évaluation sur match: {e}")
     finally:
         if 'db' in locals():
             cursor.close()
             db.close()
-    return id if id else None        
+    return id      
 
 
 
@@ -373,6 +374,29 @@ def recuperer_informations_joueur(joueur_id):
         if 'db' in locals():
             cursor.close()
             db.close()            
+  
+def recuperer_age(joueur_id):
+    result = None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = """
+        SELECT DATEDIFF(CURDATE(), date_naissance) / 365 AS age
+        FROM joueur
+        WHERE id = %s
+        """
+        cursor.execute(query, (joueur_id,))
+        result = cursor.fetchone()
+        if not result:
+            print("Aucun joueur trouvé avec cet ID.")
+        return result[0] if result else None
+    except pymysql.Error as e:
+        print(f"Erreur lors de la récupération de l'âge du joueur: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
+    
   
   
     
@@ -696,7 +720,6 @@ def recuperer_tests_morphologiques(joueur_id):
         if 'db' in locals():
             cursor.close()
             db.close()
-
 
 def recuperer_tests_medicaux(joueur_id):
     result = None 
@@ -1044,7 +1067,27 @@ def recuperer_joueurs(categorie):
             cursor.close()
             db.close()
 
+def recuperer_matchs():
+    result = None
+    try:
+        db = db_connection.create_connection()
+        cursor = db.cursor()
+        query = """
+        SELECT adversaire FROM matchs;"""
+        cursor.execute(query)
+        result = cursor.fetchall()
 
+        if not result:
+            print("Aucun match trouvé.")
+            return result 
+        print([row[0] for row in result])
+        return [row[0] for row in result]
+    except pymysql.Error as e:
+        print(f"Erreur lors de la récupération des matchs: {e}")
+    finally:
+        if 'db' in locals():
+            cursor.close()
+            db.close()
 
 def recuperer_id_evaluation_periode(joueur_id,periode_evaluation):
     pass

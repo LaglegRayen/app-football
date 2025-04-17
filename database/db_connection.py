@@ -8,7 +8,7 @@ def create_connection():
         connection = pymysql.connect(
             host="localhost",       # or your host name/IP address
             user="root",          # your MySQL username
-            password="2004",
+            password="LAGLEG123",
             database="my_database"  # optional if you want to connect to specific db
         )
         if connection in locals():

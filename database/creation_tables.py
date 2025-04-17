@@ -101,7 +101,7 @@ def creer_table_joueur():
         CREATE TABLE IF NOT EXISTS joueur (
             id INT AUTO_INCREMENT PRIMARY KEY,
             nom_prenom VARCHAR(100) NOT NULL,
-            categorie  ENUM('Junior', 'Senior'),
+            categorie  ENUM('Ecole B', 'Ecole A', 'Minime B', 'Minime A', 'Cadet B', 'Cadet A', 'Junior', 'Seniors B', 'Senior'),
             selection_nationale VARCHAR(50),
             poste_principal ENUM(
                 'Gardien', 'Arrière droit', 'Défenseur central droit', 'Défenseur central gauche', 'Arrière gauche',

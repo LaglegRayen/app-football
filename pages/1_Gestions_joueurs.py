@@ -5,10 +5,11 @@ from datetime import date
 import datetime as dt
 import os
 import matplotlib.pyplot as plt
+import plotly.express as px
+
 min_date = date(2000, 1, 1)    
 max_date_today = date.today()
 max_date = date.today()+dt.timedelta(days=1825) 
-
 
 def inserer_joueur():
     st.header("Insertion d'un joueur")
@@ -231,10 +232,15 @@ def afficher_statistiques_joueur():
                 "Date", "Moyenne Technique", "Moyenne Tactique", "Moyenne Comportementale","Moyenne Générale"
             ])
             for col in ["Moyenne Technique", "Moyenne Tactique", "Moyenne Comportementale", "Moyenne Générale"]:
+                
                 evaluations_sur_match[col] = evaluations_sur_match[col].astype(str).str.replace(r'[^\d.]', '', regex=True)
+                
                 evaluations_sur_match[col] = pd.to_numeric(evaluations_sur_match[col], errors='coerce')
+                
             evaluations_sur_match["Date"] = pd.to_datetime(evaluations_sur_match["Date"])
+            
             evaluations_sur_match = evaluations_sur_match.sort_values(by="Date", ascending=True)
+            
             st.dataframe(evaluations_sur_match, use_container_width=True)
 
 
@@ -242,6 +248,9 @@ def afficher_statistiques_joueur():
             
             
             if not evaluations_sur_match.empty:
+                fig = px.scatter(evaluations_sur_match, x='Date', y='Moyenne Générale', title='Évolution des notes')
+                st.plotly_chart(fig)
+                st.area_chart(evaluations_sur_match)
                 performance_data = evaluations_sur_match.set_index("Date")[[
                     "Moyenne Technique", "Moyenne Tactique", "Moyenne Comportementale", "Moyenne Générale"
                 ]]
@@ -298,7 +307,7 @@ def afficher_statistiques_joueur():
             cols = st.columns(3)
             afficher = False
             with cols[0]:
-                numero_match = st.number_input("Numéro du match", min_value=1, max_value=evaluations_sur_match.shape[0])
+                numero_match = st.number_input("Numéro du match", max_value=evaluations_sur_match.shape[0])
             
             with cols[1]:
                 st.markdown("<br>", unsafe_allow_html=True)
@@ -308,7 +317,7 @@ def afficher_statistiques_joueur():
             if afficher:
                 evaluations_sur_match.iloc[numero_match-1]["Date"]
 
-                videopath = "app-football\evaluations-matchs-vids\evaluation-Dupont Jean-EST-2024-10-31.mp4".format(nom_prenom,
+                videopath = "evaluations-matchs-vids\evaluation-{}-{}-{}.mp4".format(nom_prenom,
                     str(queries.recuperer_adversaire(nom_prenom,
                         evaluations_sur_match.iloc[numero_match]["Date"])),
                     str(evaluations_sur_match.iloc[numero_match-1]["Date"].date()))
