@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.41, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: my_database
+-- Host: localhost    Database: my_database
 -- ------------------------------------------------------
 -- Server version	8.0.41
 
@@ -29,6 +29,8 @@ CREATE TABLE `evaluation_sur_match` (
   `id_evaluation_tactique` int DEFAULT NULL,
   `id_evaluation_comportementale` int DEFAULT NULL,
   `moyenne_generale` decimal(3,2) DEFAULT NULL,
+  `videopath` varchar(255) NOT NULL,
+  UNIQUE KEY `h` (`id_joueur`,`id_match`),
   KEY `id_evaluation_tactique` (`id_evaluation_tactique`),
   KEY `id_evaluation_comportementale` (`id_evaluation_comportementale`),
   KEY `id_evaluation_technique` (`id_evaluation_technique`),
@@ -48,7 +50,7 @@ CREATE TABLE `evaluation_sur_match` (
 
 LOCK TABLES `evaluation_sur_match` WRITE;
 /*!40000 ALTER TABLE `evaluation_sur_match` DISABLE KEYS */;
-INSERT INTO `evaluation_sur_match` VALUES (1,2,77,77,77,NULL);
+INSERT INTO `evaluation_sur_match` VALUES (1,1,4,4,4,3.43,'vid1'),(1,2,5,5,5,4.00,'vid2'),(1,3,8,8,8,1.77,'evaluations-matchs-vids/evaluation-Dupont Jean-EST-2025-03-10 00:00:00.mp4'),(1,5,13,13,13,2.93,'videos/match_5_evaluation.mp4'),(1,6,14,14,14,2.52,'videos/match_6_evaluation.mp4'),(1,7,15,15,15,2.55,'videos/match_7_evaluation.mp4'),(1,8,16,16,16,3.25,'videos/match_8_evaluation.mp4'),(1,9,17,17,17,2.65,'videos/match_9_evaluation.mp4'),(1,10,18,18,18,2.73,'videos/match_10_evaluation.mp4'),(1,11,23,23,23,2.78,'videos/match_11_evaluation.mp4'),(1,12,24,24,24,2.13,'videos/match_12_evaluation.mp4'),(1,13,25,25,25,3.12,'videos/match_13_evaluation.mp4');
 /*!40000 ALTER TABLE `evaluation_sur_match` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -61,4 +63,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-15 20:42:55
+-- Dump completed on 2025-04-17  9:14:58
